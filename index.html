@@ -107,6 +107,13 @@ tr:hover td{background:#F5F7FA}
 .cal-info{background:#F5F7FA;border:1px solid #e0e0e0;border-radius:3px;padding:6px 8px;margin-top:6px;font-size:10px;color:#9E9E9E;flex-shrink:0}
 .bar-bg{height:4px;background:#F5F5F5;border-radius:2px;overflow:hidden;margin-top:2px}
 .bar-fill{height:100%;border-radius:2px}
+/* Insight bar */
+.insight-bar{flex-shrink:0;background:#F8FAFF;border:1px solid #DBEAFE;border-radius:5px;padding:8px 12px;margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.insight-bar-title{font-size:9px;font-weight:600;color:#1565C0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.insight-rows{display:flex;flex-wrap:wrap;gap:6px}
+.insight-item{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:#424242;line-height:1.45;flex:1;min-width:280px}
+.insight-dot{width:5px;height:5px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.insight-item b{color:#212121}
 .chip-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;flex-shrink:0}
 .chip{font-size:9px;padding:2px 8px;border:1px solid #e0e0e0;border-radius:10px;cursor:pointer;color:#616161;background:#fff}
 .chip:hover{background:#E3F2FD;color:#1565C0;border-color:#BBDEFB}
@@ -116,6 +123,19 @@ tr:hover td{background:#F5F7FA}
 .ai-row button{font-size:10px;padding:6px 14px;background:#1565C0;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-weight:500}
 .ai-row button:hover{background:#0D47A1}
 .ai-out{margin-top:8px;font-size:11px;line-height:1.7;background:#F5F7FA;border-radius:4px;padding:9px 11px;border-left:3px solid #1565C0;display:none;flex:1;overflow:auto;white-space:pre-wrap;color:#212121}
+.guide-card{background:#fff;border:1px solid #e8e8e8;border-radius:5px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.guide-card:hover{border-color:#1976D2;box-shadow:0 2px 8px rgba(21,101,192,.1)}
+.gc-title{font-size:11px;font-weight:600;color:#212121;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.gc-badge{font-size:8px;padding:1px 5px;border-radius:8px;font-weight:500}
+.gc-q{font-size:10px;color:#1565C0;font-style:italic;margin-bottom:5px;line-height:1.4}
+.gc-desc{font-size:9px;color:#616161;line-height:1.55;margin-bottom:5px}
+.gc-meta{font-size:8px;color:#9E9E9E;border-top:1px solid #f0f0f0;padding-top:4px}
+.sb-lang{border-top:1px solid #e0e0e0;padding:8px 10px;display:flex;gap:5px;flex-shrink:0}
+.sb.collapsed .sb-lang{justify-content:center}
+.lang-btn{flex:1;font-size:10px;font-weight:500;padding:4px 0;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#9E9E9E;cursor:pointer;transition:all .15s;font-family:inherit}
+.lang-btn.active{background:#1565C0;color:#fff;border-color:#1565C0}
+.lang-btn:hover:not(.active){background:#F5F5F5;color:#424242}
+.sb.collapsed .lang-btn{font-size:8px;padding:3px 2px}
 </style>
 </head>
 <body>
@@ -135,68 +155,84 @@ tr:hover td{background:#F5F7FA}
     <div class="sb-section">Main</div>
     <button class="sb-item active" onclick="nav('overview',this)">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
-      <span class="sb-label">Overview</span>
+      <span class="sb-label" data-i18n="overview">Overview</span>
     </button>
     <div class="sb-section">Reports</div>
     <button class="sb-parent open" id="par-style" onclick="togPar('style')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 7l3 3 5-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="sb-label">Style</span><span class="sb-chevron">▾</span>
+      <span class="sb-label" data-i18n="style">Style</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children open" id="ch-style">
-      <button class="sb-child" onclick="nav('best',this)">Best Sellers</button>
-      <button class="sb-child" onclick="nav('worst',this)">Worst Sellers</button>
-      <button class="sb-child" onclick="nav('stylinv',this)">Style × Inventory</button>
+      <button class="sb-child" onclick="nav('best',this)"><span data-i18n="best_inv">Best Sellers (Invoice)</span></button>
+      <button class="sb-child" onclick="nav('best-so',this)"><span data-i18n="best_so">Best Sellers (SO)</span></button>
+      <button class="sb-child" onclick="nav('worst',this)"><span data-i18n="worst">Worst Sellers</span></button>
+      <button class="sb-child" onclick="nav('so-channel',this)"><span data-i18n="so_channel">SO by Order Type</span></button>
+      <button class="sb-child" onclick="nav('cust-style',this)"><span data-i18n="cust_style">Customer × Style</span></button>
+      <button class="sb-child" onclick="nav('qtr-trend',this)"><span data-i18n="qtr_trend">Quarterly Trend</span></button>
     </div>
     <button class="sb-parent" id="par-cust" onclick="togPar('cust')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M14 13c0-1.66-1.12-3-2.5-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span class="sb-label">Customers</span><span class="sb-chevron">▾</span>
+      <span class="sb-label" data-i18n="customers">Customers</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children" id="ch-cust">
-      <button class="sb-child" onclick="nav('customers',this)">Overview</button>
-      <button class="sb-child" onclick="nav('custltv',this)">Lifetime Value</button>
+      <button class="sb-child" onclick="nav('customers',this)"><span data-i18n="cust_overview">Overview</span></button>
+      <button class="sb-child" onclick="nav('cust-rfm',this)"><span data-i18n="cust_rfm">RFM Segments</span></button>
+      <button class="sb-child" onclick="nav('cust-activity',this)"><span data-i18n="cust_activity">Activity & Churn</span></button>
+      <button class="sb-child" onclick="nav('cust-value',this)"><span data-i18n="cust_value">Value Distribution</span></button>
+      <button class="sb-child" onclick="nav('custltv',this)"><span data-i18n="custltv">Lifetime Value</span></button>
     </div>
     <button class="sb-parent" id="par-inv" onclick="togPar('inv')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span class="sb-label">Inventory</span><span class="sb-chevron">▾</span>
+      <span class="sb-label" data-i18n="inventory">Inventory</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children" id="ch-inv">
-      <button class="sb-child" onclick="nav('inventory',this)">Stock Overview</button>
-      <button class="sb-child" onclick="nav('reorder',this)">Reorder Alerts</button>
-      <button class="sb-child" onclick="nav('deadstock',this)">Dead Stock</button>
-      <button class="sb-child" onclick="nav('stockout',this)">Stockout Risk</button>
-      <button class="sb-child" onclick="nav('oversold',this)">Oversold</button>
+      <button class="sb-child" onclick="nav('inventory',this)"><span data-i18n="stock_overview">Stock Overview</span></button>
+      <button class="sb-child" onclick="nav('reorder',this)"><span data-i18n="reorder">Reorder Alerts</span></button>
+      <button class="sb-child" onclick="nav('deadstock',this)"><span data-i18n="deadstock">Dead Stock</span></button>
+      <button class="sb-child" onclick="nav('stockout',this)"><span data-i18n="stockout">Stockout Risk</span></button>
+      <button class="sb-child" onclick="nav('oversold',this)"><span data-i18n="oversold">Oversold</span></button>
     </div>
     <button class="sb-parent" id="par-ord" onclick="togPar('ord')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span class="sb-label">Orders</span><span class="sb-chevron">▾</span>
+      <span class="sb-label" data-i18n="orders">Orders</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children" id="ch-ord">
-      <button class="sb-child" onclick="nav('orders',this)">Open Backlog</button>
-      <button class="sb-child" onclick="nav('str',this)">Sell-Through Rate</button>
+      <button class="sb-child" onclick="nav('orders',this)"><span data-i18n="backlog">Open Backlog</span></button>
+      <button class="sb-child" onclick="nav('str',this)"><span data-i18n="str">Sell-Through Rate</span></button>
+      <button class="sb-child" onclick="nav('ts-detail',this)"><span data-i18n="ts_detail">Trade Show Detail</span></button>
+      <button class="sb-child" onclick="nav('ts-compare',this)"><span data-i18n="ts_compare">Trade Show Compare</span></button>
     </div>
     <button class="sb-parent" id="par-po" onclick="togPar('po')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v4M11 1v4M1 7h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span class="sb-label">PO / Incoming</span>
+      <span class="sb-label" data-i18n="po">PO / Incoming</span>
       <span class="sb-badge">682</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children" id="ch-po">
-      <button class="sb-child" onclick="nav('calendar',this)">ETA Calendar</button>
-      <button class="sb-child" onclick="nav('polist',this)">Overdue List</button>
+      <button class="sb-child" onclick="nav('calendar',this)"><span data-i18n="eta_cal">ETA Calendar</span></button>
+      <button class="sb-child" onclick="nav('polist',this)"><span data-i18n="overdue">Overdue List</span></button>
     </div>
     <button class="sb-parent" id="par-fin" onclick="togPar('fin')">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v6M6 7h3.5a1.5 1.5 0 010 3H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span class="sb-label">Finance</span><span class="sb-chevron">▾</span>
+      <span class="sb-label" data-i18n="finance">Finance</span><span class="sb-chevron">▾</span>
     </button>
     <div class="sb-children" id="ch-fin">
-      <button class="sb-child" onclick="nav('ar',this)">Accounts Receivable</button>
-      <button class="sb-child" onclick="nav('reps',this)">Sales Reps</button>
+      <button class="sb-child" onclick="nav('ar',this)"><span data-i18n="ar">Accounts Receivable</span></button>
+      <button class="sb-child" onclick="nav('reps',this)"><span data-i18n="reps">Sales Reps</span></button>
     </div>
     <div class="sb-section">Tools</div>
+    <button class="sb-item" onclick="nav('guide',this)">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v5M8 5.5v-.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="sb-label" data-i18n="guide">Report Guide</span>
+    </button>
     <button class="sb-item" onclick="nav('ai',this)">
       <svg class="sb-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
       <span class="sb-label">AI Query</span>
       <span class="sb-label" style="margin-left:auto;font-size:8px;background:#E3F2FD;color:#1565C0;padding:1px 5px;border-radius:8px;flex-shrink:0">AI</span>
     </button>
+  </div>
+  <div class="sb-lang">
+    <button id="lang-en" class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button id="lang-ko" class="lang-btn" onclick="setLang('ko')">한국어</button>
   </div>
 </div>
 
@@ -206,19 +242,19 @@ tr:hover td{background:#F5F7FA}
       <span class="topbar-title" id="pg-title">Overview</span>
       <span class="topbar-crumb" id="pg-sub">As of April 1, 2026</span>
     </div>
-    <select class="period-select" onchange="setPd(this.value)">
+    <select class="period-select" id="period-select" onchange="setPd(this.value)">
       <option value="30d">Last 30 days</option>
       <option value="90d">Last 90 days</option>
       <option value="ytd">Year to date</option>
-      <option value="all">All time</option>
+      <option value="all" selected>All time</option>
     </select>
   </div>
 
   <!-- OVERVIEW -->
   <div class="page active" id="pg-overview">
     <div class="krow">
-      <div class="kcard kg"><div class="klabel">Revenue (Mar 2026)</div><div class="kval">$1.68M</div><div class="ksub up">↑ +31.4% vs Feb</div></div>
-      <div class="kcard"><div class="klabel">Open Backlog</div><div class="kval">$10.9M</div><div class="ksub" style="color:#9E9E9E">619K units</div></div>
+      <div class="kcard kg"><div class="klabel">Revenue (Mar 2026)</div><div class="kval" id="ov-rev">$1.68M</div><div class="ksub up" id="ov-rev-sub">↑ +31.4% vs Feb</div></div>
+      <div class="kcard"><div class="klabel" id="ov-inv-lbl">Invoices</div><div class="kval" id="ov-inv">67,013</div><div class="ksub" id="ov-inv-sub" style="color:#9E9E9E">all time</div></div>
       <div class="kcard"><div class="klabel">On-Hand Units</div><div class="kval">237K</div><div class="ksub" style="color:#9E9E9E">WH warehouse</div></div>
       <div class="kcard kr"><div class="klabel">Open AR</div><div class="kval">$19.2M</div><div class="ksub dn">90+d: $13.9M (72.5%)</div></div>
     </div>
@@ -241,17 +277,35 @@ tr:hover td{background:#F5F7FA}
   <!-- BEST SELLERS -->
   <div class="page" id="pg-best">
     <div class="krow">
-      <div class="kcard kg"><div class="klabel">#1 Best Seller</div><div class="kval" style="font-size:13px">BP353J</div><div class="ksub up">$4.26M · 123,941 units</div></div>
-      <div class="kcard"><div class="klabel">Top 5 share</div><div class="kval">11.0%</div><div class="ksub" style="color:#9E9E9E">of $158M</div></div>
-      <div class="kcard"><div class="klabel">Unique styles sold</div><div class="kval">2,091</div><div class="ksub" style="color:#9E9E9E">of 4,900 total</div></div>
+      <div class="kcard kg"><div class="klabel">#1 by Revenue</div><div class="kval" style="font-size:13px">BP353J</div><div class="ksub up">$4.26M · 123,941 units</div></div>
+      <div class="kcard kg"><div class="klabel">#1 by Units</div><div class="kval" style="font-size:13px">BP353J</div><div class="ksub up">123,941 units · $4.26M</div></div>
+      <div class="kcard"><div class="klabel">Unique styles sold</div><div class="kval">2,091</div><div class="ksub" style="color:#9E9E9E">of 4,900 total · Invoice basis</div></div>
       <div class="kcard kg"><div class="klabel">Top category</div><div class="kval" style="font-size:13px">PANTS</div><div class="ksub up">$126M · 80%</div></div>
     </div>
-    <div class="row-fill" style="grid-template-columns:1fr;flex:0.85">
-      <div class="card"><div class="card-hd">Top 20 Best Selling Styles</div><div class="chart-wrap"><canvas id="c-best"></canvas></div></div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.15;min-height:0">
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;padding:8px 14px">
+        <span style="font-size:11px;color:#424242;font-weight:500;white-space:nowrap">Sort by</span>
+        <select id="best-sort" onchange="updateBestSellers()" style="font-size:12px;padding:4px 28px 4px 10px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#212121;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22%3E%3Cpath d=%22M1 1l4 4 4-4%22 stroke=%22%23424242%22 stroke-width=%221.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 8px center;font-family:inherit">
+          <option value="rev">Revenue (Amount)</option>
+          <option value="qty">Units (Quantity)</option>
+        </select>
+        <span style="font-size:10px;color:#9E9E9E">Invoice basis · all-time</span>
+      </div>
     </div>
-    <div class="row-fill" style="grid-template-columns:1fr;flex:1.15">
-      <div class="card"><div class="card-hd">Top 20 Detail</div>
-        <div class="tbl-wrap"><table><thead><tr><th style="width:4%">#</th><th style="width:13%">Style</th><th style="width:44%">Description</th><th style="width:9%">Cat</th><th class="tr" style="width:16%">Revenue</th><th class="tr" style="width:14%">Units</th></tr></thead><tbody id="tb-best"></tbody></table></div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.9">
+      <div class="card"><div class="card-hd" id="best-chart-hd">Top 20 Best Selling Styles — Revenue</div><div class="chart-wrap"><canvas id="c-best"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:1.0">
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd" id="best-tbl-hd">Top 20 Detail — by Revenue</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:4%">#</th><th style="width:13%">Style</th><th style="width:42%">Description</th><th style="width:9%">Cat</th><th class="tr" style="width:16%">Revenue</th><th class="tr" style="width:16%">Units</th></tr>
+            </thead>
+            <tbody id="tb-best"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -265,26 +319,143 @@ tr:hover td{background:#F5F7FA}
       <div class="kcard"><div class="klabel">Sell rate</div><div class="kval">42.7%</div></div>
     </div>
     <div class="row-fill" style="grid-template-columns:1fr">
-      <div class="card"><div class="card-hd">Worst Sellers — Bottom 13 Styles</div>
+      <div class="card"><div class="card-hd" id="worst-hd">Worst Sellers — Bottom 13 Styles</div>
         <div class="tbl-wrap"><table><thead><tr><th style="width:18%">Style</th><th style="width:54%">Description</th><th class="tr" style="width:15%">Revenue</th><th class="tr" style="width:13%">Units</th></tr></thead><tbody id="tb-worst"></tbody></table></div>
       </div>
     </div>
   </div>
 
-  <!-- STYLE × INVENTORY -->
-  <div class="page" id="pg-stylinv">
+  <!-- BEST SELLERS SO -->
+  <div class="page" id="pg-best-so">
     <div class="krow">
-      <div class="kcard"><div class="klabel">Styles w/ stock</div><div class="kval">689</div></div>
-      <div class="kcard kr"><div class="klabel">Oversold (neg OTS)</div><div class="kval">5</div><div class="ksub dn">immediate action</div></div>
-      <div class="kcard ka"><div class="klabel">Low cover</div><div class="kval">12</div><div class="ksub wn">&lt; 50%</div></div>
-      <div class="kcard"><div class="klabel">Total OH (WH)</div><div class="kval">237K</div></div>
+      <div class="kcard kg"><div class="klabel">#1 SO Style</div><div class="kval" style="font-size:13px">JT001</div><div class="ksub up">$422K · 309 customers</div></div>
+      <div class="kcard"><div class="klabel">Total SO styles</div><div class="kval">~400</div><div class="ksub" style="color:#9E9E9E">with open orders</div></div>
+      <div class="kcard"><div class="klabel">Total SO revenue</div><div class="kval">$9.0M</div><div class="ksub" style="color:#9E9E9E">open + recent orders</div></div>
+      <div class="kcard"><div class="klabel">Basis</div><div class="kval" style="font-size:13px">Sales Order</div><div class="ksub" style="color:#9E9E9E">current pipeline</div></div>
     </div>
-    <div class="row-fill" style="grid-template-columns:1fr">
-      <div class="card"><div class="card-hd">Top 15 Styles by On-Hand Units</div>
-        <div class="tbl-wrap"><table><thead><tr><th style="width:17%">Style</th><th style="width:40%">Description</th><th class="tr" style="width:14%">OH</th><th class="tr" style="width:14%">OTS</th><th class="tr" style="width:15%">ATS</th></tr></thead><tbody id="tb-inv"></tbody></table></div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.85">
+      <div class="card"><div class="card-hd">Top 20 Best Sellers — Sales Order Basis</div><div class="chart-wrap"><canvas id="c-best-so"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:1.0">
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd">Top 20 Detail — SO Basis</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:4%">#</th><th style="width:14%">Style</th><th class="tr" style="width:18%">Revenue</th><th class="tr" style="width:13%">Units</th><th class="tr" style="width:13%">Orders</th><th class="tr" style="width:14%">Customers</th><th class="tr" style="width:12%">Avg/Order</th></tr>
+            </thead>
+            <tbody id="tb-best-so"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- SO BY ORDER TYPE -->
+  <div class="page" id="pg-so-channel">
+    <div class="krow">
+      <div class="kcard kg"><div class="klabel">#1 SO Type</div><div class="kval" style="font-size:13px">In-House</div><div class="ksub up">$5.2M · MS006, MP005...</div></div>
+      <div class="kcard"><div class="klabel">Showroom</div><div class="kval">$3.1M</div><div class="ksub" style="color:#9E9E9E">top: AS001T, DP790-26</div></div>
+      <div class="kcard"><div class="klabel">Web Order</div><div class="kval">$652K</div><div class="ksub" style="color:#9E9E9E">top: BP433J, BP473J</div></div>
+      <div class="kcard"><div class="klabel">Fashion Go</div><div class="kval">$458K</div><div class="ksub" style="color:#9E9E9E">top: BP433J, JT001</div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.15;min-height:0">
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;padding:8px 14px">
+        <span style="font-size:11px;color:#424242;font-weight:500;white-space:nowrap">SO Type</span>
+        <select id="sotype-select" onchange="updateSOType()" style="font-size:12px;padding:4px 28px 4px 10px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#212121;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22%3E%3Cpath d=%22M1 1l4 4 4-4%22 stroke=%22%23424242%22 stroke-width=%221.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 8px center;font-family:inherit">
+          <option value="IN-HOUSE">In-House</option>
+          <option value="SHOWROOM">Showroom</option>
+          <option value="WEB ORDER">Web Order</option>
+          <option value="FASHION GO">Fashion Go</option>
+          <option value="E-MAIL ORDER">E-Mail Order</option>
+        </select>
+        <span style="font-size:10px;color:#9E9E9E" id="sotype-sub">$5.2M total · 10 top styles</span>
+      </div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd" id="sotype-chart-hd">Top 10 Styles — In-House</div><div class="chart-wrap"><canvas id="c-sotype"></canvas></div></div>
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd" id="sotype-tbl-hd">In-House · Style Detail</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:4%">#</th><th style="width:18%">Style</th><th class="tr" style="width:20%">Revenue</th><th class="tr" style="width:16%">Units</th><th class="tr" style="width:14%">Share</th></tr>
+            </thead>
+            <tbody id="tb-sotype"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER × STYLE -->
+  <div class="page" id="pg-cust-style">
+    <div class="krow">
+      <div class="kcard kg"><div class="klabel">#1 Customer (SO)</div><div class="kval" style="font-size:11px">Stitch Fix</div><div class="ksub up">$5.22M open SO</div></div>
+      <div class="kcard"><div class="klabel">#2 Customer</div><div class="kval" style="font-size:11px">Altard State</div><div class="ksub" style="color:#9E9E9E">$1.05M</div></div>
+      <div class="kcard"><div class="klabel">#3 Customer</div><div class="kval" style="font-size:11px">Bohme</div><div class="ksub" style="color:#9E9E9E">$647K</div></div>
+      <div class="kcard"><div class="klabel">Basis</div><div class="kval" style="font-size:13px">Sales Order</div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.25;min-height:0">
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;padding:8px 14px">
+        <span style="font-size:11px;color:#424242;font-weight:500;white-space:nowrap">Customer</span>
+        <select id="cust-select" onchange="updateCustStyle()" style="font-size:12px;padding:4px 28px 4px 10px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#212121;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22%3E%3Cpath d=%22M1 1l4 4 4-4%22 stroke=%22%23424242%22 stroke-width=%221.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 8px center;font-family:inherit">
+          <option value="0">STITCH FIX-HQ</option>
+          <option value="1">ALTARD STATE</option>
+          <option value="2">BOHME</option>
+          <option value="3">NUULY</option>
+          <option value="4">PANTS STORE</option>
+          <option value="5">VESTIQUE-WAREHOUSE</option>
+          <option value="6">BOBBLES &amp; LACE MIA</option>
+          <option value="7">THE WILLOW TREE-5</option>
+          <option value="8">NATI</option>
+          <option value="9">STITCH AND FEATHER-H</option>
+        </select>
+      </div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd" id="cs-chart-hd">Top Styles — STITCH FIX-HQ</div><div class="chart-wrap"><canvas id="c-cust-style"></canvas></div></div>
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd" id="cs-tbl-hd">Style Detail</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:5%">#</th><th style="width:22%">Style</th><th class="tr" style="width:22%">Revenue</th><th class="tr" style="width:18%">Units</th><th class="tr" style="width:18%">Share</th></tr>
+            </thead>
+            <tbody id="tb-cust-style"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTERLY TREND -->
+  <div class="page" id="pg-qtr-trend">
+    <div class="krow">
+      <div class="kcard kg"><div class="klabel">Strongest Q (SO)</div><div class="kval">2026-Q1</div><div class="ksub up">pipeline build-up</div></div>
+      <div class="kcard"><div class="klabel">Data range</div><div class="kval" style="font-size:13px">Q1 25 – Q1 26</div><div class="ksub" style="color:#9E9E9E">SO order date basis</div></div>
+      <div class="kcard kg"><div class="klabel">Top Q1 26 style</div><div class="kval" style="font-size:13px">JT001</div><div class="ksub up">$351K in Q1 26</div></div>
+      <div class="kcard"><div class="klabel">Styles tracked</div><div class="kval">10</div><div class="ksub" style="color:#9E9E9E">top SO styles</div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:1.2">
+      <div class="card"><div class="card-hd">Quarterly SO Revenue — Top 10 Styles</div><div class="chart-wrap"><canvas id="c-qtr"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.8">
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd">Quarterly Breakdown</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:14%">Style</th><th class="tr" style="width:17%">2025-Q1</th><th class="tr" style="width:17%">2025-Q2</th><th class="tr" style="width:17%">2025-Q3</th><th class="tr" style="width:17%">2025-Q4</th><th class="tr" style="width:18%">2026-Q1</th></tr>
+            </thead>
+            <tbody id="tb-qtr"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STYLE × INVENTORY (removed but keeping empty div for legacy nav) -->
 
   <!-- REORDER -->
   <div class="page" id="pg-reorder">
@@ -353,17 +524,21 @@ tr:hover td{background:#F5F7FA}
     </div>
   </div>
 
-  <!-- CUSTOMERS -->
+  <!-- CUSTOMERS OVERVIEW -->
   <div class="page" id="pg-customers">
     <div class="krow">
-      <div class="kcard"><div class="klabel">Total customers</div><div class="kval">6,159</div></div>
-      <div class="kcard kg"><div class="klabel">Repeat rate</div><div class="kval">66.3%</div><div class="ksub up">4,081 repeat</div></div>
-      <div class="kcard"><div class="klabel">Active (Mar)</div><div class="kval">921</div><div class="ksub up">105 new</div></div>
-      <div class="kcard kg"><div class="klabel">Mar repeat rate</div><div class="kval">88.6%</div></div>
+      <div class="kcard"><div class="klabel">Total customers</div><div class="kval">7,158</div><div class="ksub" style="color:#9E9E9E">all-time invoice basis</div></div>
+      <div class="kcard kg"><div class="klabel">Active (last 30d)</div><div class="kval">1,704</div><div class="ksub up">23.8% of total</div></div>
+      <div class="kcard ka"><div class="klabel">At Risk</div><div class="kval">933</div><div class="ksub wn">active 2024, silent now</div></div>
+      <div class="kcard kr"><div class="klabel">Lost / Inactive</div><div class="kval">3,651</div><div class="ksub dn">365d+ no purchase</div></div>
     </div>
     <div class="row-fill row21">
+      <div class="card"><div class="card-hd">Monthly New Customers <span class="card-hd-sub">Feb 2025 – Mar 2026</span></div><div class="chart-wrap"><canvas id="c-new-cust"></canvas></div></div>
+      <div class="card"><div class="card-hd">Activity Funnel</div><div class="chart-wrap"><canvas id="c-funnel"></canvas></div></div>
+    </div>
+    <div class="row-fill row21" style="flex:0.8">
       <div class="card"><div class="card-hd">New vs Repeat per Month</div><div class="chart-wrap"><canvas id="c-cust"></canvas></div></div>
-      <div class="card"><div class="card-hd">Customer Mix</div>
+      <div class="card"><div class="card-hd">Customer Mix (All-Time)</div>
         <div class="chart-wrap" style="flex:0.7"><canvas id="c-custd"></canvas></div>
         <div style="border-top:1px solid #e0e0e0;margin-top:8px;padding-top:8px;flex-shrink:0">
           <div style="font-size:9px;color:#9E9E9E">March 2026</div>
@@ -371,6 +546,77 @@ tr:hover td{background:#F5F7FA}
           <div style="font-size:9px;color:#9E9E9E">816 repeat / 105 new</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- RFM SEGMENTS -->
+  <div class="page" id="pg-cust-rfm">
+    <div class="krow">
+      <div class="kcard kg"><div class="klabel">Champions</div><div class="kval">917</div><div class="ksub up">$57.7M · 75.8% of rev</div></div>
+      <div class="kcard kg"><div class="klabel">Loyal</div><div class="kval">864</div><div class="ksub up">$6.7M · bought freq</div></div>
+      <div class="kcard ka"><div class="klabel">At Risk</div><div class="kval">933</div><div class="ksub wn">$5.1M · freq but gone silent</div></div>
+      <div class="kcard kr"><div class="klabel">Lost</div><div class="kval">3,651</div><div class="ksub dn">$5.7M · need win-back</div></div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd">Segment Size</div><div class="chart-wrap"><canvas id="c-rfm-size"></canvas></div></div>
+      <div class="card"><div class="card-hd">Segment Revenue</div><div class="chart-wrap"><canvas id="c-rfm-rev"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.6">
+      <div class="card" style="overflow:hidden">
+        <div class="card-hd">Segment Detail</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:18%">Segment</th><th style="width:14%">Definition</th><th class="tr" style="width:12%">Count</th><th class="tr" style="width:15%">Revenue</th><th class="tr" style="width:14%">Rev Share</th><th class="tr" style="width:14%">Avg LTV</th><th style="width:13%">Action</th></tr>
+            </thead>
+            <tbody id="tb-rfm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY & CHURN -->
+  <div class="page" id="pg-cust-activity">
+    <div class="krow">
+      <div class="kcard kr"><div class="klabel">2024 Churn Rate</div><div class="kval">44.6%</div><div class="ksub dn">1,972 of 4,426 lost</div></div>
+      <div class="kcard ka"><div class="klabel">2025 Churn Rate</div><div class="kval">59.0%</div><div class="ksub wn">2,612 of 4,430 at risk</div></div>
+      <div class="kcard kg"><div class="klabel">Retained 2024→2025</div><div class="kval">2,454</div><div class="ksub up">55.4% retention</div></div>
+      <div class="kcard"><div class="klabel">Avg recency</div><div class="kval">~180d</div><div class="ksub" style="color:#9E9E9E">days since last order</div></div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd">Retention vs Churn by Year</div><div class="chart-wrap"><canvas id="c-churn"></canvas></div></div>
+      <div class="card"><div class="card-hd">Customer Recency Distribution</div><div class="chart-wrap"><canvas id="c-recency"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.7">
+      <div class="card"><div class="card-hd">Top 20 Customers — Recency Alert</div>
+        <div style="flex:1;overflow-y:auto;min-height:0">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#fff;z-index:1">
+              <tr><th style="width:5%">#</th><th style="width:30%">Customer</th><th class="tr" style="width:16%">Revenue</th><th class="tr" style="width:12%">Orders</th><th style="width:18%">Last Invoice</th><th class="tr" style="width:12%">Recency</th><th style="width:7%">Status</th></tr>
+            </thead>
+            <tbody id="tb-recency"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE DISTRIBUTION -->
+  <div class="page" id="pg-cust-value">
+    <div class="krow">
+      <div class="kcard kr"><div class="klabel">Revenue concentration</div><div class="kval">Top 1%</div><div class="ksub dn">= 57.3% of all revenue</div></div>
+      <div class="kcard kr"><div class="klabel">Top 10% share</div><div class="kval">81.8%</div><div class="ksub dn">highly concentrated</div></div>
+      <div class="kcard"><div class="klabel">1-order customers</div><div class="kval">2,437</div><div class="ksub" style="color:#9E9E9E">34.1% of all customers</div></div>
+      <div class="kcard kg"><div class="klabel">50+ order customers</div><div class="kval">230</div><div class="ksub up">$47.6M · 62.5% of rev</div></div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd">Order Frequency — Customer Count</div><div class="chart-wrap"><canvas id="c-freq-cnt"></canvas></div></div>
+      <div class="card"><div class="card-hd">Order Frequency — Revenue</div><div class="chart-wrap"><canvas id="c-freq-rev"></canvas></div></div>
+    </div>
+    <div class="row-fill row2" style="flex:0.8">
+      <div class="card"><div class="card-hd">AOV Segment — Customer Count</div><div class="chart-wrap"><canvas id="c-aov-cnt"></canvas></div></div>
+      <div class="card"><div class="card-hd">AOV Segment — Revenue</div><div class="chart-wrap"><canvas id="c-aov-rev"></canvas></div></div>
     </div>
   </div>
 
@@ -430,6 +676,65 @@ tr:hover td{background:#F5F7FA}
     <div class="row-fill row2">
       <div class="card"><div class="card-hd">Season Sell-Through Rate</div><div class="chart-wrap"><canvas id="c-str"></canvas></div></div>
       <div class="card"><div class="card-hd">Open Orders by Season</div><div class="chart-wrap"><canvas id="c-season"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- TRADE SHOW DETAIL -->
+  <div class="page" id="pg-ts-detail">
+    <div class="krow" id="ts-krow">
+      <div class="kcard kg"><div class="klabel">Selected Show Total</div><div class="kval" id="ts-total">—</div></div>
+      <div class="kcard"><div class="klabel">Total Shows</div><div class="kval" id="ts-count">—</div></div>
+      <div class="kcard kg"><div class="klabel">Best Show</div><div class="kval" id="ts-best">—</div></div>
+      <div class="kcard"><div class="klabel">YoY Growth</div><div class="kval" id="ts-yoy">—</div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.3">
+      <div class="card" style="flex-direction:row;align-items:center;gap:12px;padding:10px 14px">
+        <span style="font-size:11px;color:#424242;font-weight:500;white-space:nowrap">Trade Show</span>
+        <select id="ts-select" onchange="updateTsDetail()" style="font-size:12px;padding:5px 28px 5px 10px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#212121;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22%3E%3Cpath d=%22M1 1l4 4 4-4%22 stroke=%22%23424242%22 stroke-width=%221.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 8px center;font-family:inherit">
+          <option value="DALLAS">Dallas</option>
+          <option value="ATLANTA">Atlanta</option>
+          <option value="MAGIC-LV">Magic Las Vegas</option>
+          <option value="MAGIC-NY">Magic New York</option>
+          <option value="MAGIC-NASHVI">Magic Nashville</option>
+          <option value="MAGIC-MIA">Magic Miami</option>
+          <option value="SURF">Surf</option>
+          <option value="NORTHSTAR">Northstar</option>
+          <option value="HAWAII">Hawaii</option>
+          <option value="FLAIRE">Flaire</option>
+          <option value="CALA">CALA</option>
+        </select>
+        <span style="font-size:10px;color:#9E9E9E" id="ts-subtitle">Revenue & orders per show date</span>
+      </div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd">Revenue per Show Date</div><div class="chart-wrap"><canvas id="c-ts-rev"></canvas></div></div>
+      <div class="card"><div class="card-hd">Orders per Show Date</div><div class="chart-wrap"><canvas id="c-ts-ord"></canvas></div></div>
+    </div>
+    <div class="row-fill" style="grid-template-columns:1fr;flex:0.8">
+      <div class="card"><div class="card-hd" id="ts-tbl-hd">Show Date Detail</div>
+        <div class="tbl-wrap"><table><thead><tr>
+          <th style="width:22%">Show Date</th>
+          <th class="tr" style="width:18%">Revenue</th>
+          <th class="tr" style="width:12%">Orders</th>
+          <th class="tr" style="width:13%">Units</th>
+          <th class="tr" style="width:16%">Avg Order</th>
+          <th class="tr" style="width:12%">vs Prior</th>
+        </tr></thead><tbody id="tb-ts-detail"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRADE SHOW COMPARE -->
+  <div class="page" id="pg-ts-compare">
+    <div class="krow">
+      <div class="kcard kg"><div class="klabel">#1 Show (Total)</div><div class="kval" style="font-size:13px">MAGIC-LV</div><div class="ksub up">$3.83M · 5 shows</div></div>
+      <div class="kcard kg"><div class="klabel">Fastest growing</div><div class="kval" style="font-size:13px">SURF</div><div class="ksub up">$42K → $159K → $159K</div></div>
+      <div class="kcard"><div class="klabel">Total TS revenue</div><div class="kval">$12.2M</div><div class="ksub" style="color:#9E9E9E">all shows · inv + SO</div></div>
+      <div class="kcard"><div class="klabel">Active shows</div><div class="kval">11</div><div class="ksub" style="color:#9E9E9E">2022–2026</div></div>
+    </div>
+    <div class="row-fill row2">
+      <div class="card"><div class="card-hd">Total Revenue by Show (SO basis)</div><div class="chart-wrap"><canvas id="c-ts-bar"></canvas></div></div>
+      <div class="card"><div class="card-hd">Orders &amp; Units by Show</div><div class="chart-wrap"><canvas id="c-ts-pie"></canvas></div></div>
     </div>
   </div>
 
@@ -529,6 +834,199 @@ tr:hover td{background:#F5F7FA}
     </div>
   </div>
 
+  <!-- REPORT GUIDE -->
+  <div class="page" id="pg-guide">
+    <div style="flex:1;overflow-y:auto;min-height:0;padding-bottom:12px">
+
+      <!-- STYLE section -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #E3F2FD">📊 Style Reports</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="guide-card" onclick="nav('best',document.querySelector('.sb-child'))">
+            <div class="gc-title">Best Sellers <span class="gc-badge" style="background:#E3F2FD;color:#1565C0">Invoice</span></div>
+            <div class="gc-q">어떤 스타일이 가장 많이 팔렸나요?</div>
+            <div class="gc-desc">전체 Invoice 기준 Top 20 스타일. Revenue 또는 Units 기준으로 정렬 가능. 카테고리별 색상 구분.</div>
+            <div class="gc-meta">Basis: Invoice · All-time · Sort: Rev / Qty</div>
+          </div>
+          <div class="guide-card" onclick="nav('best-so',null)">
+            <div class="gc-title">Best Sellers <span class="gc-badge" style="background:#FFF3E0;color:#E65100">SO</span></div>
+            <div class="gc-q">지금 오더가 가장 많이 들어오는 스타일은?</div>
+            <div class="gc-desc">현재 파이프라인(Sales Order) 기준 Top 20. 1개 고객만 주문한 스타일은 주황 경고 뱃지로 표시.</div>
+            <div class="gc-meta">Basis: Sales Order · Current pipeline</div>
+          </div>
+          <div class="guide-card" onclick="nav('worst',null)">
+            <div class="gc-title">Worst Sellers</div>
+            <div class="gc-q">안 팔리는 스타일은 무엇인가요?</div>
+            <div class="gc-desc">매출 최하위 13개 스타일. 클리어런스 대상 식별용.</div>
+            <div class="gc-meta">Basis: Invoice · All-time</div>
+          </div>
+          <div class="guide-card" onclick="nav('so-channel',null)">
+            <div class="gc-title">SO by Order Type</div>
+            <div class="gc-q">채널/타입별로 어떤 스타일이 팔리나요?</div>
+            <div class="gc-desc">In-House / Showroom / Web Order / Fashion Go / E-Mail 각 SO 타입별 Top 10 스타일과 매출 비중.</div>
+            <div class="gc-meta">Basis: Sales Order · 5 types</div>
+          </div>
+          <div class="guide-card" onclick="nav('cust-style',null)">
+            <div class="gc-title">Customer × Style</div>
+            <div class="gc-q">각 고객이 주로 어떤 스타일을 사나요?</div>
+            <div class="gc-desc">Top 10 고객별 구매 스타일 분석. 드롭다운으로 고객 선택, 차트+테이블로 스타일 비중 확인.</div>
+            <div class="gc-meta">Basis: Sales Order · Top 10 customers</div>
+          </div>
+          <div class="guide-card" onclick="nav('qtr-trend',null)">
+            <div class="gc-title">Quarterly Trend</div>
+            <div class="gc-q">어느 분기에 어떤 스타일이 강한가요?</div>
+            <div class="gc-desc">Q1 25 ~ Q1 26 분기별 Top 10 스타일 매출 스택 바. 시즌 패턴과 성장 스타일 파악.</div>
+            <div class="gc-meta">Basis: Sales Order · 5 quarters</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS section -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #E8F5E9">👥 Customer Reports</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="guide-card" onclick="nav('customers',null)">
+            <div class="gc-title">Overview</div>
+            <div class="gc-q">고객 현황이 어떻게 되나요?</div>
+            <div class="gc-desc">월별 신규 고객 트렌드, Activity Funnel (30/90/180/365d), New vs Repeat 비율.</div>
+            <div class="gc-meta">Total: 7,158 · Active 30d: 1,704</div>
+          </div>
+          <div class="guide-card" onclick="nav('cust-rfm',null)">
+            <div class="gc-title">RFM Segments</div>
+            <div class="gc-q">고객을 어떻게 분류할 수 있나요?</div>
+            <div class="gc-desc">Champions / Loyal / At Risk / Lost / New / Promising 6개 세그먼트. 세그먼트별 고객 수와 매출 비중. Champions 12.8%가 전체 매출의 75.8% 차지.</div>
+            <div class="gc-meta">Recency + Frequency + Monetary 기반</div>
+          </div>
+          <div class="guide-card" onclick="nav('cust-activity',null)">
+            <div class="gc-title">Activity &amp; Churn</div>
+            <div class="gc-q">얼마나 많은 고객이 이탈하나요?</div>
+            <div class="gc-desc">2024 churn 44.6%, 2025 churn 59.0%. Retention vs Churn 바 차트. Top 20 고객 recency 알럿.</div>
+            <div class="gc-meta">⚠ 2024 고객 4,426명 중 1,972명 이탈</div>
+          </div>
+          <div class="guide-card" onclick="nav('cust-value',null)">
+            <div class="gc-title">Value Distribution</div>
+            <div class="gc-q">고객 가치가 얼마나 편중되어 있나요?</div>
+            <div class="gc-desc">Top 1%가 매출의 57.3% 차지. 주문 빈도 분포 (1회 vs 50+회), AOV 세그먼트별 고객 수 vs 매출.</div>
+            <div class="gc-meta">Top 10%: 81.8% of revenue</div>
+          </div>
+          <div class="guide-card" onclick="nav('custltv',null)">
+            <div class="gc-title">Lifetime Value</div>
+            <div class="gc-q">누가 가장 가치 있는 고객인가요?</div>
+            <div class="gc-desc">All-time 매출 기준 Top 10 고객. VIP / Gold / Silver 티어, 주문 수, 평균 주문 금액.</div>
+            <div class="gc-meta">Basis: Invoice · All-time · #1: Stitch Fix $20.6M</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTORY section -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #FFF3E0">📦 Inventory Reports</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="guide-card" onclick="nav('inventory',null)">
+            <div class="gc-title">Stock Overview</div>
+            <div class="gc-q">현재 재고 현황은?</div>
+            <div class="gc-desc">WH 창고 기준 OH 상위 15 스타일. OTS 음수(oversold) 스타일 빨간색 강조.</div>
+            <div class="gc-meta">OH 237,452 · WH warehouse</div>
+          </div>
+          <div class="guide-card" onclick="nav('reorder',null)">
+            <div class="gc-title">Reorder Alerts</div>
+            <div class="gc-q">재주문이 필요한 스타일은?</div>
+            <div class="gc-desc">OH vs Open Orders 비율(Cover Ratio)이 낮은 스타일. 10% 미만 critical, 50% 미만 watch.</div>
+            <div class="gc-meta">Critical 4개 · Watch 3개</div>
+          </div>
+          <div class="guide-card" onclick="nav('deadstock',null)">
+            <div class="gc-title">Dead Stock</div>
+            <div class="gc-q">팔리지 않고 쌓인 재고는?</div>
+            <div class="gc-desc">OH 500+ 이면서 마지막 Invoice 180일 이상 경과한 스타일 8개. Slow Movers (90-180d) 5개 포함.</div>
+            <div class="gc-meta">Dead: 8 styles · Slow: 5 styles</div>
+          </div>
+          <div class="guide-card" onclick="nav('stockout',null)">
+            <div class="gc-title">Stockout Risk</div>
+            <div class="gc-q">품절 위험이 있는 스타일은?</div>
+            <div class="gc-desc">매출 높은데 ATS 음수이거나 커버리지 낮은 스타일. Revenue at risk $2.5M.</div>
+            <div class="gc-meta">10 styles · $2.5M at risk</div>
+          </div>
+          <div class="guide-card" onclick="nav('oversold',null)">
+            <div class="gc-title">Oversold</div>
+            <div class="gc-q">주문이 재고보다 많은 스타일은?</div>
+            <div class="gc-desc">OTS 음수 12개 스타일. AS001T -15,221 units 최대 초과. 오더는 들어왔지만 재고 부족 상태.</div>
+            <div class="gc-meta">12 styles · AS001T -15,221 units</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS section -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#6A1B9A;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #F3E5F5">🗂 Orders Reports</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="guide-card" onclick="nav('orders',null)">
+            <div class="gc-title">Open Backlog</div>
+            <div class="gc-q">아직 처리 안 된 오더는?</div>
+            <div class="gc-desc">Open SO 기준 스타일별 미처리 수량 및 금액. JT001 11,453 units $246K가 1위.</div>
+            <div class="gc-meta">$10.9M open · 619K units</div>
+          </div>
+          <div class="guide-card" onclick="nav('str',null)">
+            <div class="gc-title">Sell-Through Rate</div>
+            <div class="gc-q">시즌별 소진율은?</div>
+            <div class="gc-desc">SP26 24.6%로 최고. FA25 17.2%, SP25 13.5%. 시즌별 재고 소진 비율 바 차트.</div>
+            <div class="gc-meta">SP26 best · FA23 3.0% worst</div>
+          </div>
+          <div class="guide-card" onclick="nav('ts-detail',null)">
+            <div class="gc-title">Trade Show Detail</div>
+            <div class="gc-q">각 트레이드쇼 실적은?</div>
+            <div class="gc-desc">Dallas / Atlanta / Magic LV 등 쇼별 드롭다운. 회차별 Revenue, Orders, Units, vs Prior % 변화.</div>
+            <div class="gc-meta">Invoice + SO merged · 11 shows</div>
+          </div>
+          <div class="guide-card" onclick="nav('ts-compare',null)">
+            <div class="gc-title">Trade Show Compare</div>
+            <div class="gc-q">어느 쇼가 가장 실적이 좋나요?</div>
+            <div class="gc-desc">전체 쇼 매출 가로 바 비교. #1 Magic LV $3.8M, Surf 가장 빠른 성장. Orders & Units도 비교.</div>
+            <div class="gc-meta">Magic LV #1 · $12.2M total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PO / FINANCE section -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#AD1457;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #FCE4EC">📅 PO / Incoming</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="guide-card" onclick="nav('calendar',null)">
+              <div class="gc-title">ETA Calendar</div>
+              <div class="gc-q">이번 달 입고 일정은?</div>
+              <div class="gc-desc">월별 캘린더에 PO ETA 표시. 색상으로 Overdue / This week / This month / Upcoming 구분.</div>
+              <div class="gc-meta">682 overdue · 78 this week</div>
+            </div>
+            <div class="guide-card" onclick="nav('polist',null)">
+              <div class="gc-title">Overdue List</div>
+              <div class="gc-q">연체된 PO는?</div>
+              <div class="gc-desc">기한 초과 PO 목록. 최대 89일 연체. 긴급 처리 대상 리스트.</div>
+              <div class="gc-meta">682 lines · 1,076,210 units</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #E3F2FD">💰 Finance</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="guide-card" onclick="nav('ar',null)">
+              <div class="gc-title">Accounts Receivable</div>
+              <div class="gc-q">미수금 현황은?</div>
+              <div class="gc-desc">오픈 AR $19.2M, 평균 141.8일. 90일+ 연체가 72.5%. 고객별 미수금 리스크 등급.</div>
+              <div class="gc-meta">⚠ 90+d: $13.9M (72.5%)</div>
+            </div>
+            <div class="guide-card" onclick="nav('reps',null)">
+              <div class="gc-title">Sales Reps</div>
+              <div class="gc-q">영업사원별 실적은?</div>
+              <div class="gc-desc">In-House $31.5M 압도적 1위. Faire 채널 합산 $7.4M. 최근 6개월 트렌드 라인 차트.</div>
+              <div class="gc-meta">8 reps · In-House #1 $31.5M</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- AI QUERY -->
   <div class="page" id="pg-ai">
     <div class="chip-wrap">
@@ -558,7 +1056,133 @@ const fK=v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':
 const f$=v=>'$'+Math.round(v).toLocaleString();
 const gc='rgba(0,0,0,0.04)';
 
-// ── SIDEBAR ───────────────────────────────────────────────
+// ── i18n ─────────────────────────────────────────────────
+let curLang = 'en';
+
+const T = {
+  en: {
+    // Sections
+    s_main:'Main', s_reports:'Reports', s_tools:'Tools',
+    // Sidebar items
+    overview:'Overview',
+    style:'Style', best_inv:'Best Sellers (Invoice)', best_so:'Best Sellers (SO)',
+    worst:'Worst Sellers', so_channel:'SO by Order Type',
+    cust_style:'Customer × Style', qtr_trend:'Quarterly Trend',
+    customers:'Customers', cust_overview:'Overview', cust_rfm:'RFM Segments',
+    cust_activity:'Activity & Churn', cust_value:'Value Distribution', custltv:'Lifetime Value',
+    inventory:'Inventory', stock_overview:'Stock Overview', reorder:'Reorder Alerts',
+    deadstock:'Dead Stock', stockout:'Stockout Risk', oversold:'Oversold',
+    orders:'Orders', backlog:'Open Backlog', str:'Sell-Through Rate',
+    ts_detail:'Trade Show Detail', ts_compare:'Trade Show Compare',
+    po:'PO / Incoming', eta_cal:'ETA Calendar', overdue:'Overdue List',
+    finance:'Finance', ar:'Accounts Receivable', reps:'Sales Reps',
+    guide:'Report Guide', ai:'AI Query',
+    // Period dropdown
+    pd_30:'Last 30 days', pd_90:'Last 90 days', pd_ytd:'Year to date', pd_all:'All time',
+    // KPI labels
+    revenue:'Revenue', open_backlog:'Open Backlog', on_hand:'On-Hand Units', open_ar:'Open AR',
+    total_cust:'Total Customers', active_30:'Active (last 30d)', at_risk:'At Risk', lost:'Lost / Inactive',
+    // Table headers
+    th_style:'Style', th_desc:'Description', th_cat:'Category', th_rev:'Revenue',
+    th_units:'Units', th_orders:'Orders', th_customers:'Customers', th_avg:'Avg Order',
+    th_share:'Share', th_cover:'Cover', th_oh:'OH', th_ots:'OTS', th_ats:'ATS',
+    th_customer:'Customer', th_last:'Last Invoice', th_recency:'Recency', th_status:'Status',
+    th_show:'Show Date', th_vs_prior:'vs Prior', th_qty:'Units',
+    // Buttons
+    sort_by:'Sort by', sort_rev:'Revenue (Amount)', sort_qty:'Units (Quantity)',
+    analyze:'Analyze', channel:'Channel', so_type:'SO Type',
+    // Insight bar
+    key_insights:'💡 Key Insights',
+    // Misc
+    invoice_basis:'Invoice basis', so_basis:'Sales Order basis',
+    as_of:'As of April 1, 2026',
+  },
+  ko: {
+    // Sections
+    s_main:'메인', s_reports:'리포트', s_tools:'도구',
+    // Sidebar
+    overview:'개요',
+    style:'스타일', best_inv:'베스트셀러 (Invoice)', best_so:'베스트셀러 (SO)',
+    worst:'워스트셀러', so_channel:'SO 주문 타입별',
+    cust_style:'고객 × 스타일', qtr_trend:'분기별 트렌드',
+    customers:'고객', cust_overview:'개요', cust_rfm:'RFM 세그먼트',
+    cust_activity:'활동 & 이탈', cust_value:'가치 분포', custltv:'고객 생애가치',
+    inventory:'재고', stock_overview:'재고 현황', reorder:'재주문 알림',
+    deadstock:'데드스톡', stockout:'품절 위험', oversold:'오버셀링',
+    orders:'오더', backlog:'오픈 백오더', str:'시즌 소진율',
+    ts_detail:'트레이드쇼 상세', ts_compare:'트레이드쇼 비교',
+    po:'PO / 입고', eta_cal:'입고 캘린더', overdue:'연체 목록',
+    finance:'재무', ar:'미수금 (AR)', reps:'영업사원',
+    guide:'리포트 가이드', ai:'AI 질의',
+    // Period
+    pd_30:'최근 30일', pd_90:'최근 90일', pd_ytd:'올해 누계', pd_all:'전체 기간',
+    // KPI labels
+    revenue:'매출', open_backlog:'오픈 백오더', on_hand:'재고 수량', open_ar:'미수금',
+    total_cust:'전체 고객', active_30:'활성 고객 (30일)', at_risk:'이탈 위험', lost:'비활성 / 이탈',
+    // Table headers
+    th_style:'스타일', th_desc:'상품명', th_cat:'카테고리', th_rev:'매출',
+    th_units:'수량', th_orders:'오더 수', th_customers:'고객 수', th_avg:'평균 오더',
+    th_share:'비중', th_cover:'커버리지', th_oh:'재고(OH)', th_ots:'OTS', th_ats:'ATS',
+    th_customer:'고객', th_last:'마지막 Invoice', th_recency:'경과일', th_status:'상태',
+    th_show:'쇼 날짜', th_vs_prior:'전 회차 대비', th_qty:'수량',
+    // Buttons
+    sort_by:'정렬 기준', sort_rev:'매출 (금액)', sort_qty:'수량 (Units)',
+    analyze:'분석하기', channel:'채널', so_type:'SO 타입',
+    // Insight bar
+    key_insights:'💡 주요 인사이트',
+    // Misc
+    invoice_basis:'Invoice 기준', so_basis:'Sales Order 기준',
+    as_of:'2026년 4월 1일 기준',
+  }
+};
+
+function t(key){ return (T[curLang]||T.en)[key] || (T.en)[key] || key; }
+
+function setLang(lang){
+  curLang = lang;
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  document.getElementById('lang-ko').classList.toggle('active', lang==='ko');
+  applyLang();
+}
+
+function applyLang(){
+  // Sidebar sections
+  document.querySelectorAll('.sb-section').forEach((el,i)=>{
+    const keys=['s_main','s_reports','s_reports','s_reports','s_reports','s_reports','s_reports','s_tools'];
+    const map={Main:'s_main',Reports:'s_reports',Tools:'s_tools'};
+    const k=map[el.textContent.trim()];
+    if(k) el.textContent=t(k);
+  });
+  // Sidebar labels by data-i18n attribute
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent=t(el.dataset.i18n);
+  });
+  // Period select options
+  const ps=document.getElementById('period-select');
+  if(ps){
+    ps.options[0].text=t('pd_30');
+    ps.options[1].text=t('pd_90');
+    ps.options[2].text=t('pd_ytd');
+    ps.options[3].text=t('pd_all');
+  }
+  // Sort dropdown in best sellers
+  const bs=document.getElementById('best-sort');
+  if(bs){bs.options[0].text=t('sort_rev');bs.options[1].text=t('sort_qty');}
+  // Topbar title
+  const pgEl=document.querySelector('.page.active');
+  const pgId2=pgEl?pgEl.id.replace('pg-',''):'overview';
+  document.getElementById('pg-title').textContent=(curLang==='ko'?TITLES_KO:TITLES_EN)[pgId2]||pgId2;
+  if(sub&&pgId==='overview') sub.textContent=t('as_of');
+  // KPI labels — use data-i18n on klabel elements
+  // Re-render insight bar
+  renderInsight(pgId);
+  // Update best-sort label
+  const sortLbl=document.getElementById('best-sort-lbl');
+  if(sortLbl) sortLbl.textContent=t('sort_by');
+  // AI button
+  const aiBtn=document.querySelector('#pg-ai button');
+  if(aiBtn) aiBtn.textContent=t('analyze');
+}
 let sbCollapsed=false;
 function toggleSb(){
   sbCollapsed=!sbCollapsed;
@@ -575,8 +1199,11 @@ function togPar(k){
 function setPd(v){console.log('Period:',v);}
 
 // ── NAV ───────────────────────────────────────────────────
-const TITLES={overview:'Overview',best:'Style — Best Sellers',worst:'Style — Worst Sellers',stylinv:'Style — Style × Inventory',reorder:'Inventory — Reorder Alerts',deadstock:'Inventory — Dead Stock',stockout:'Inventory — Stockout Risk',oversold:'Inventory — Oversold',customers:'Customers — Overview',custltv:'Customers — Lifetime Value',inventory:'Inventory — Stock Overview',orders:'Orders — Open Backlog',str:'Orders — Sell-Through Rate',calendar:'PO / Incoming — ETA Calendar',polist:'PO / Incoming — Overdue List',ar:'Finance — Accounts Receivable',reps:'Finance — Sales Reps',ai:'AI Query'};
-const SUBS={overview:'As of April 1, 2026',best:'All-time data · 2,091 styles sold',worst:'Bottom 13 · clearance candidates',stylinv:'WH stock vs open orders',reorder:'Cover ratio alerts',deadstock:'OH > 500 · last invoice 180d+ ago',stockout:'High revenue styles with negative ATS or low cover',oversold:'Negative OTS · ordered more than available',customers:'6,159 customers · 66.3% repeat',custltv:'All-time revenue by customer',inventory:'689 styles with stock',orders:'$10.9M open SO backlog',str:'Season sell-through analysis',calendar:'1,243 open PO lines',polist:'682 overdue · 1,076,210 units',ar:'Open AR $19.2M · avg 141.8d',reps:'8 reps · $158M total revenue',ai:'BigQuery 데이터 기반'};
+const TITLES_EN={overview:'Overview',best:'Style — Best Sellers (Invoice)',worst:'Style — Worst Sellers','best-so':'Style — Best Sellers (SO)','so-channel':'Style — SO by Order Type','cust-style':'Style — Customer × Style','qtr-trend':'Style — Quarterly Trend',reorder:'Inventory — Reorder Alerts',deadstock:'Inventory — Dead Stock',stockout:'Inventory — Stockout Risk',oversold:'Inventory — Oversold',customers:'Customers — Overview','cust-rfm':'Customers — RFM Segments','cust-activity':'Customers — Activity & Churn','cust-value':'Customers — Value Distribution',custltv:'Customers — Lifetime Value',inventory:'Inventory — Stock Overview',orders:'Orders — Open Backlog',str:'Orders — Sell-Through Rate','ts-detail':'Orders — Trade Show Detail','ts-compare':'Orders — Trade Show Compare',calendar:'PO / Incoming — ETA Calendar',polist:'PO / Incoming — Overdue List',ar:'Finance — Accounts Receivable',reps:'Finance — Sales Reps',guide:'Report Guide',ai:'AI Query'};
+const TITLES_KO={overview:'개요',best:'스타일 — 베스트셀러 (Invoice)',worst:'스타일 — 워스트셀러','best-so':'스타일 — 베스트셀러 (SO)','so-channel':'스타일 — SO 주문 타입별','cust-style':'스타일 — 고객 × 스타일','qtr-trend':'스타일 — 분기별 트렌드',reorder:'재고 — 재주문 알림',deadstock:'재고 — 데드스톡',stockout:'재고 — 품절 위험',oversold:'재고 — 오버셀링',customers:'고객 — 개요','cust-rfm':'고객 — RFM 세그먼트','cust-activity':'고객 — 활동 & 이탈','cust-value':'고객 — 가치 분포',custltv:'고객 — 고객 생애가치',inventory:'재고 — 재고 현황',orders:'오더 — 오픈 백오더',str:'오더 — 시즌 소진율','ts-detail':'오더 — 트레이드쇼 상세','ts-compare':'오더 — 트레이드쇼 비교',calendar:'PO / 입고 — 입고 캘린더',polist:'PO / 입고 — 연체 목록',ar:'재무 — 미수금 (AR)',reps:'재무 — 영업사원',guide:'리포트 가이드',ai:'AI 질의'};
+const SUBS_EN={overview:'As of April 1, 2026',best:'Invoice basis · all-time · 2,091 styles sold',worst:'Bottom 13 · clearance candidates','best-so':'Sales Order basis · current pipeline','so-channel':'Top styles by SO order type · In-House / Showroom / Web / FashionGo','cust-style':'What each customer orders most · Invoice basis','qtr-trend':'Quarterly revenue trend by style · SO order date basis',reorder:'Cover ratio alerts',deadstock:'OH > 500 · last invoice 180d+ ago',stockout:'High revenue styles with negative ATS or low cover',oversold:'Negative OTS · ordered more than available',customers:'7,158 total customers · invoice basis','cust-rfm':'Champion 917 · Loyal 864 · At Risk 933 · Lost 3,651','cust-activity':'2024 churn 44.6% · top 20 customer recency alert','cust-value':'Revenue concentration · order frequency · AOV distribution',custltv:'All-time revenue by customer',inventory:'689 styles with stock',orders:'$10.9M open SO backlog',str:'Season sell-through analysis','ts-detail':'Select a show to view revenue & order trends','ts-compare':'All trade shows · invoice + SO merged',calendar:'1,243 open PO lines',polist:'682 overdue · 1,076,210 units',ar:'Open AR $19.2M · avg 141.8d',reps:'8 reps · $158M total revenue',guide:'각 리포트가 어떤 질문에 답하는지 안내합니다',ai:'BigQuery 데이터 기반'};
+const SUBS_KO={overview:'2026년 4월 1일 기준',best:'Invoice 기준 · 전체 기간 · 2,091개 스타일',worst:'하위 13개 · 클리어런스 대상','best-so':'Sales Order 기준 · 현재 파이프라인','so-channel':'SO 주문 타입별 상위 스타일','cust-style':'고객별 주요 구매 스타일 · Invoice 기준','qtr-trend':'분기별 스타일 매출 트렌드 · SO 기준',reorder:'커버리지 알림',deadstock:'OH>500 · 마지막 Invoice 180일+ 경과',stockout:'매출 높은데 ATS 부족 스타일',oversold:'OTS 음수 · 오버셀링 스타일',customers:'전체 고객 7,158명 · Invoice 기준','cust-rfm':'챔피언 917 · 충성 864 · 위험 933 · 이탈 3,651','cust-activity':'2024 이탈률 44.6% · 상위 20 고객 recency 알림','cust-value':'매출 집중도 · 주문 빈도 · AOV 분포',custltv:'전체 기간 고객별 매출',inventory:'689개 스타일 재고 있음',orders:'오픈 SO 백오더 $10.9M',str:'시즌 소진율 분석','ts-detail':'쇼를 선택해 매출 & 주문 트렌드 확인','ts-compare':'전체 트레이드쇼 · Invoice + SO 합산',calendar:'오픈 PO 1,243개',polist:'682개 연체 · 1,076,210 units',ar:'오픈 AR $19.2M · 평균 141.8일',reps:'영업사원 8명 · 총 매출 $158M',guide:'각 리포트가 어떤 질문에 답하는지 안내합니다',ai:'BigQuery 데이터 기반'};
+const TITLES=TITLES_EN, SUBS=SUBS_EN;
 const ci={};
 function nav(pg,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -584,10 +1211,23 @@ function nav(pg,el){
   if(e)e.classList.add('active');
   document.querySelectorAll('.sb-item,.sb-child').forEach(b=>b.classList.remove('active'));
   if(el)el.classList.add('active');
-  document.getElementById('pg-title').textContent=TITLES[pg]||pg;
-  document.getElementById('pg-sub').textContent=SUBS[pg]||'';
+  document.getElementById('pg-title').textContent=(curLang==='ko'?TITLES_KO:TITLES_EN)[pg]||pg;
+  document.getElementById('pg-sub').textContent=(curLang==='ko'?SUBS_KO:SUBS_EN)[pg]||'';
   setTimeout(()=>drawCharts(pg),60);
+  setTimeout(()=>renderInsight(pg),100);
   if(pg==='calendar')renderCal();
+  if(pg==='best')setTimeout(()=>updateBestSellers(),80);
+  if(pg==='best-so')setTimeout(()=>initBestSO(),80);
+  if(pg==='worst')setTimeout(()=>renderWorst(),80);
+  if(pg==='so-channel')setTimeout(()=>updateSOType(),80);
+  if(pg==='cust-style')setTimeout(()=>updateCustStyle(),80);
+  if(pg==='qtr-trend')setTimeout(()=>initQtrTrend(),80);
+  if(pg==='customers')setTimeout(()=>initCustOverview(),80);
+  if(pg==='cust-rfm')setTimeout(()=>initRFM(),80);
+  if(pg==='cust-activity')setTimeout(()=>initCustActivity(),80);
+  if(pg==='cust-value')setTimeout(()=>initCustValue(),80);
+  if(pg==='ts-detail')setTimeout(()=>updateTsDetail(),80);
+  if(pg==='ts-compare')setTimeout(()=>drawTsCompare(),80);
 }
 
 // ── DATA ─────────────────────────────────────────────────
@@ -612,12 +1252,58 @@ const ETA_MO=[{m:'Jan',u:360294},{m:'Feb',u:335428},{m:'Mar',u:380488},{m:'Apr',
 const CAL_EV={'2026-04-01':{u:7800,p:5,a:'w'},'2026-04-03':{u:23850,p:7,a:'w'},'2026-04-04':{u:5100,p:4,a:'w'},'2026-04-05':{u:29832,p:49,a:'w'},'2026-04-07':{u:4400,p:8,a:'w'},'2026-04-10':{u:16650,p:4,a:'m'},'2026-04-13':{u:7982,p:11,a:'m'},'2026-04-17':{u:23280,p:7,a:'m'},'2026-04-21':{u:33448,p:53,a:'m'},'2026-04-24':{u:96300,p:8,a:'m'},'2026-04-30':{u:75000,p:3,a:'m'},'2026-05-05':{u:24640,p:39,a:'u'},'2026-05-15':{u:93171,p:6,a:'u'},'2026-06-05':{u:18408,p:25,a:'u'},'2026-07-05':{u:30745,p:43,a:'u'}};
 const URGENT=[{po:800358,eta:'Jan 02',s:'D-F739M1-MX',u:50000,d:-89},{po:800360,eta:'Jan 02',s:'I-FS60647W-3',u:50000,d:-89},{po:30354,eta:'Jan 05',s:'BP433J',u:600,d:-86},{po:800416,eta:'Apr 01',s:'I-TLK10303',u:15000,d:0},{po:105786,eta:'Apr 03',s:'BP433J+BP473J',u:23850,d:2},{po:30598,eta:'Apr 05',s:'BP613J+BP510J',u:8400,d:4},{po:105789,eta:'Apr 05',s:'IP240P+IP234',u:9832,d:4},{po:105607,eta:'Apr 07',s:'JH305',u:4400,d:6}];
 
-// ── TABLES ───────────────────────────────────────────────
-function populateTables(){
-  const bT=document.getElementById('tb-best');
-  if(bT)BEST20.forEach((r,i)=>{const cc=r.c==='PANTS'?'tb':r.c==='SHORT PANTS'?'tg':'tgr';bT.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td style="color:#616161">${r.d}</td><td><span class="tag ${cc}">${r.c}</span></td><td class="tr">${fK(r.r)}</td><td class="tr">${r.q.toLocaleString()}</td></tr>`;});
+const BEST20_QTY=[{s:'BP353J',d:'HR Utility Wide Leg',c:'PANTS',r:4255761,q:123941},{s:'BP433J',d:'Patch Pocket Wide Leg',c:'PANTS',r:3920424,q:106619},{s:'BP370J',d:'HR Tonal Crop Flare',c:'PANTS',r:2610959,q:72814},{s:'BP339J',d:'HR Cargo Pocket',c:'PANTS',r:2501530,q:68910},{s:'BP333J',d:'HR Scissor Cut Flare',c:'PANTS',r:2328301,q:65917},{s:'AB237',d:'Slim Wide Leg Jean',c:'PANTS',r:1176349,q:61713},{s:'CD123K',d:'A Line Frayed Skirt',c:'SKIRTS',r:1014847,q:61234},{s:'BP304J',d:'HR Vintage Straight',c:'PANTS',r:2063508,q:61062},{s:'SF32H-3',d:'Short With Cuff',c:'SHORT PANTS',r:1109873,q:60992},{s:'JT001',d:'Denim Skort',c:'SHORT PANTS',r:1097007,q:56146},{s:'BP370J-A',d:'HR Tonal Crop Flare A',c:'PANTS',r:1888313,q:51889},{s:'BP473J',d:'Barrel Jean With Seams',c:'PANTS',r:1881189,q:48625},{s:'JP862',d:'HR Wide Leg',c:'PANTS',r:814506,q:47205},{s:'BP239J',d:'HR Wide Leg',c:'PANTS',r:1560938,q:46328},{s:'DP683',d:'Slim Wide Leg',c:'PANTS',r:1186817,q:45734},{s:'DP649',d:'Utility Pant',c:'PANTS',r:1095247,q:43197},{s:'AB996',d:'Slim Wide Leg',c:'PANTS',r:764664,q:40921},{s:'AB721',d:'Wide Leg Jean',c:'PANTS',r:710674,q:40396},{s:'AB825',d:'Relaxed Wide Leg',c:'PANTS',r:669075,q:38250},{s:'BP460J',d:'Scissor Cut Wide Leg',c:'PANTS',r:1413966,q:37314}];
+
+let bestChart=null;
+function updateBestSellers(){
+  const sort=document.getElementById('best-sort').value;
+  const pd=PD_BEST[curPeriod]||PD_BEST['all'];
+  const data=sort==='qty'?[...pd.qty]:([...pd.rev]);
+  const isQty=sort==='qty';
+  const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
+  document.getElementById('best-chart-hd').textContent=isQty?`Top 20 Best Selling Styles — Units (${pdLabel})`:`Top 20 Best Selling Styles — Revenue (${pdLabel})`;
+  document.getElementById('best-tbl-hd').textContent=isQty?`Top 20 Detail — by Units · ${pdLabel}`:`Top 20 Detail — by Revenue · ${pdLabel}`;
+
+  // Redraw chart
+  if(bestChart) bestChart.destroy();
+  bestChart = new Chart(document.getElementById('c-best'),{
+    type:'bar',
+    data:{
+      labels:data.map(d=>d.s),
+      datasets:[{
+        data: isQty ? data.map(d=>d.qty) : data.map(d=>d.rev),
+        backgroundColor:P.blue,
+        borderRadius:3
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>isQty?(v>=1000?Math.round(v/1000)+'K':v):fK(v),font:{size:8}},grid:{color:gc}},
+              x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45}}}}
+  });
+
+  // Rebuild table
+  const tbody = document.getElementById('tb-best');
+  tbody.innerHTML='';
+  data.forEach((r,i)=>{
+    const primaryVal = isQty
+      ? `<td class="tr" style="font-weight:500">${r.qty.toLocaleString()}</td><td class="tr">${fK(r.rev)}</td>`
+      : `<td class="tr" style="font-weight:500">${fK(r.rev)}</td><td class="tr">${r.qty.toLocaleString()}</td>`;
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td style="color:#616161">—</td><td><span class="tag tb">—</span></td>${primaryVal}</tr>`;
+  });
+}
+function renderWorst(){
+  const data=PD_WORST[curPeriod]||PD_WORST['all'];
+  const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
   const wT=document.getElementById('tb-worst');
-  if(wT)WORST.forEach(r=>{wT.innerHTML+=`<tr><td><strong>${r.s}</strong></td><td style="color:#616161">${r.d}</td><td class="tr" style="color:#E53935">$${r.r}</td><td class="tr">${r.q}</td></tr>`;});
+  if(!wT) return;
+  wT.innerHTML='';
+  data.forEach(r=>{wT.innerHTML+=`<tr><td><strong>${r.s}</strong></td><td style="color:#616161">—</td><td class="tr" style="color:#E53935">$${r.rev}</td><td class="tr">${r.qty}</td></tr>`;});
+  const hd=document.getElementById('worst-hd');
+  if(hd) hd.textContent=`Worst Sellers — Bottom 13 · ${pdLabel}`;
+}
+function populateTables(){
+  // tb-best handled by updateBestSellers()
+  // tb-worst handled by renderWorst()
   [document.getElementById('tb-inv'),document.getElementById('tb-inv2')].forEach(iT=>{
     if(iT)INV.forEach(r=>{const c=r.ots<0?'color:#E53935':'';iT.innerHTML+=`<tr><td><strong>${r.s}</strong></td><td style="color:#616161">${r.d}</td><td class="tr">${r.oh.toLocaleString()}</td><td class="tr" style="${c}">${r.ots.toLocaleString()}</td><td class="tr">${r.ats.toLocaleString()}</td></tr>`;});
   });
@@ -647,20 +1333,464 @@ function populateTables(){
 }
 populateTables();
 
+// ── CUSTOMER ANALYTICS DATA ──────────────────────────────
+const RFM_SEGS={Champions:917,Loyal:864,'At Risk':933,Lost:3651,New:470,Promising:323};
+const RFM_REV={Champions:57727267,Loyal:6732127,'At Risk':5119853,Lost:5740306,New:406856,Promising:356146};
+const RFM_DEF={Champions:'Active 30d + 10+ orders',Loyal:'Active 90d + 4+ orders',New:'First order ≤90d',Promising:'Active 90d + 1-3 orders','At Risk':'Silent 180d+ but frequent',Lost:'365d+ no purchase'};
+const RFM_ACTION={Champions:'Reward & upsell',Loyal:'Keep engaged',New:'Onboard well',Promising:'Encourage 2nd order','At Risk':'Win-back campaign',Lost:'Re-engagement'};
+const RFM_COLOR={Champions:P.blue,Loyal:P.green,'At Risk':P.orange,Lost:P.red,New:P.teal,Promising:P.sky};
+const FUNNEL={'0-30d':1704,'31-90d':870,'91-180d':723,'181-365d':1398,'365d+':2463};
+const FREQ_DIST={'1 order':2437,'2-3':1638,'4-10':1637,'11-50':1216,'50+':230};
+const FREQ_REV={'1 order':1166392,'2-3':2055152,'4-10':5527455,'11-50':19778832,'50+':47554724};
+const AOV_DIST={'<$500':4682,'$500-2K':2331,'$2K-5K':103,'$5K-10K':31,'$10K+':11};
+const AOV_REV={'<$500':9790571,'$500-2K':25674701,'$2K-5K':28353203,'$5K-10K':6724026,'$10K+':5540054};
+const MONTHLY_NEW={'2025-02':229,'2025-03':200,'2025-04':204,'2025-05':185,'2025-06':202,'2025-07':146,'2025-08':159,'2025-09':206,'2025-10':166,'2025-11':116,'2025-12':53,'2026-01':238,'2026-02':190,'2026-03':229};
+const CHURN_DATA_C={'2024':{total:4426,churned:1972,retained:2454},'2025':{total:4430,churned:2612,retained:1818}};
+const TOP20_RECENCY=[
+  {c:'STITCH FIX-HQ',rev:20590241,orders:4146,recency:2,last:'2026-03-30'},
+  {c:'ALTARD STATE',rev:2396636,orders:105,recency:2,last:'2026-03-30'},
+  {c:'NATI',rev:1571381,orders:281,recency:1,last:'2026-03-31'},
+  {c:'JUST BLACK DENIM INC',rev:1379578,orders:227,recency:2,last:'2026-03-30'},
+  {c:'NUULY',rev:1066827,orders:195,recency:14,last:'2026-03-18'},
+  {c:'BOHME',rev:959920,orders:50,recency:29,last:'2026-03-03'},
+  {c:'LULUS-COM',rev:952038,orders:201,recency:7,last:'2026-03-25'},
+  {c:'SHOP AVARA',rev:778732,orders:55,recency:12,last:'2026-03-20'},
+  {c:'BOBBLES AND LACE',rev:772591,orders:146,recency:72,last:'2026-01-19'},
+  {c:'STITCH AND FEATHER-H',rev:756837,orders:109,recency:20,last:'2026-03-12'},
+  {c:'PANTS STORE',rev:746310,orders:202,recency:7,last:'2026-03-25'},
+  {c:'POOL HOUSE NEW YORK',rev:561919,orders:23,recency:240,last:'2025-08-04'},
+  {c:'BRAD AND ZOE DBA PIN',rev:553886,orders:145,recency:12,last:'2026-03-20'},
+  {c:'NATI NEW YORK',rev:540829,orders:176,recency:6,last:'2026-03-26'},
+  {c:'THE PAPER STORE',rev:466262,orders:48,recency:8,last:'2026-03-24'},
+  {c:'MIXOLOGY',rev:433556,orders:33,recency:9,last:'2026-03-23'},
+  {c:'CALLED TO SURF1',rev:389344,orders:142,recency:8,last:'2026-03-24'},
+  {c:'STILE BY PER-LEI',rev:386468,orders:114,recency:2,last:'2026-03-30'},
+  {c:'VESTIQUE-WAREHOUSE',rev:321242,orders:84,recency:2,last:'2026-03-30'},
+  {c:'SCHEELS',rev:317065,orders:326,recency:26,last:'2026-03-06'},
+];
+
+function initCustOverview(){
+  const mnKeys=Object.keys(MONTHLY_NEW),mnVals=Object.values(MONTHLY_NEW);
+  new Chart(document.getElementById('c-new-cust'),{type:'bar',data:{labels:mnKeys,datasets:[{data:mnVals,backgroundColor:mnVals.map((_,i)=>i>=11?P.blue:P.sky),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45}}}}});
+  new Chart(document.getElementById('c-funnel'),{type:'bar',data:{labels:Object.keys(FUNNEL),datasets:[{data:Object.values(FUNNEL),backgroundColor:[P.blue,P.green,P.yellow,P.orange,P.red],borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+}
+
+function initRFM(){
+  const segs=Object.keys(RFM_SEGS),cols=segs.map(s=>RFM_COLOR[s]||P.blue);
+  new Chart(document.getElementById('c-rfm-size'),{type:'doughnut',data:{labels:segs,datasets:[{data:segs.map(s=>RFM_SEGS[s]),backgroundColor:cols,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9,padding:5}}}}});
+  new Chart(document.getElementById('c-rfm-rev'),{type:'doughnut',data:{labels:segs,datasets:[{data:segs.map(s=>RFM_REV[s]),backgroundColor:cols,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9,padding:5}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fK(ctx.raw)}`}}}}});
+  const totalRev=Object.values(RFM_REV).reduce((a,b)=>a+b,0);
+  const tbody=document.getElementById('tb-rfm');
+  segs.forEach(s=>{
+    const cnt=RFM_SEGS[s],rev=RFM_REV[s],share=(rev/totalRev*100).toFixed(1),avltv=fK(rev/cnt);
+    const tagCol={Champions:'tg',Loyal:'tg','At Risk':'ta',Lost:'tr2',New:'tb',Promising:'tb'}[s]||'tgr';
+    tbody.innerHTML+=`<tr><td><span class="tag ${tagCol}">${s}</span></td><td style="color:#9E9E9E;font-size:9px">${RFM_DEF[s]}</td><td class="tr">${cnt.toLocaleString()}</td><td class="tr">${fK(rev)}</td><td class="tr" style="font-weight:500">${share}%</td><td class="tr">${avltv}</td><td style="font-size:9px;color:#616161">${RFM_ACTION[s]}</td></tr>`;
+  });
+}
+
+function initCustActivity(){
+  const yrs=Object.keys(CHURN_DATA_C);
+  new Chart(document.getElementById('c-churn'),{type:'bar',data:{labels:yrs,datasets:[{label:'Retained',data:yrs.map(y=>CHURN_DATA_C[y].retained),backgroundColor:P.green,borderRadius:3,stack:'s'},{label:'Churned',data:yrs.map(y=>CHURN_DATA_C[y].churned),backgroundColor:P.red,borderRadius:3,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:9},boxWidth:9}}},scales:{y:{stacked:true,ticks:{font:{size:8}},grid:{color:gc}},x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}}}});
+  new Chart(document.getElementById('c-recency'),{type:'bar',data:{labels:Object.keys(FUNNEL),datasets:[{data:Object.values(FUNNEL),backgroundColor:[P.blue,P.green,P.yellow,P.orange,P.red],borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+  const tbody=document.getElementById('tb-recency');
+  TOP20_RECENCY.forEach((r,i)=>{
+    const status=r.recency<=30?'<span class="tag tg">active</span>':r.recency<=90?'<span class="tag tb">recent</span>':r.recency<=180?'<span class="tag ta">watch</span>':'<span class="tag tr2">at risk</span>';
+    const recCol=r.recency<=30?'color:#43A047':r.recency<=90?'color:#1976D2':r.recency<=180?'color:#FB8C00':'color:#E53935';
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.c}</strong></td><td class="tr">${fK(r.rev)}</td><td class="tr">${r.orders}</td><td>${r.last}</td><td class="tr" style="${recCol};font-weight:500">${r.recency}d</td><td>${status}</td></tr>`;
+  });
+}
+
+function initCustValue(){
+  const fKeys=Object.keys(FREQ_DIST),fCols=[P.red,P.orange,P.yellow,P.green,P.blue];
+  new Chart(document.getElementById('c-freq-cnt'),{type:'bar',data:{labels:fKeys,datasets:[{data:Object.values(FREQ_DIST),backgroundColor:fCols,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+  new Chart(document.getElementById('c-freq-rev'),{type:'bar',data:{labels:fKeys,datasets:[{data:Object.values(FREQ_REV),backgroundColor:fCols,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+  const aKeys=Object.keys(AOV_DIST),aCols=[P.red,P.orange,P.yellow,P.green,P.blue];
+  new Chart(document.getElementById('c-aov-cnt'),{type:'bar',data:{labels:aKeys,datasets:[{data:Object.values(AOV_DIST),backgroundColor:aCols,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+  new Chart(document.getElementById('c-aov-rev'),{type:'bar',data:{labels:aKeys,datasets:[{data:Object.values(AOV_REV),backgroundColor:aCols,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
+}
+
+// ── SO BEST SELLERS DATA ─────────────────────────────────
+const BEST20_SO=[{s:'JT001',rev:422053,qty:19788,orders:428,customers:309},{s:'BP433J',rev:283842,qty:7669,orders:393,customers:331},{s:'AS001T',rev:241697,qty:15227,orders:7,customers:1},{s:'BP473J',rev:241616,qty:6127,orders:280,customers:234},{s:'DP790-26',rev:215453,qty:11225,orders:6,customers:1},{s:'BP460J',rev:180980,qty:4679,orders:212,customers:171},{s:'DP433-26',rev:172178,qty:9062,orders:4,customers:1},{s:'DP783',rev:168697,qty:6159,orders:283,customers:249},{s:'MS006',rev:164200,qty:9800,orders:8,customers:1},{s:'MP005',rev:150000,qty:7000,orders:5,customers:1},{s:'MS007',rev:135150,qty:8350,orders:7,customers:1},{s:'BP471N',rev:130962,qty:3409,orders:176,customers:161},{s:'AB231H',rev:125800,qty:7400,orders:14,customers:1},{s:'AB404H',rev:124100,qty:7300,orders:19,customers:1},{s:'JA800',rev:122151,qty:4854,orders:40,customers:34},{s:'DP786',rev:121205,qty:4505,orders:148,customers:141},{s:'BP468J',rev:120073,qty:3211,orders:137,customers:128},{s:'BP370J-A',rev:117465,qty:3239,orders:177,customers:167},{s:'BP239J',rev:113062,qty:3298,orders:81,customers:67},{s:'MP006',rev:110000,qty:5000,orders:2,customers:1}];
+
+// ── SO BY ORDER TYPE DATA ────────────────────────────────
+const SO_TYPE_DATA={
+  'IN-HOUSE':   {total:5217028, top:[{s:'MS006',rev:164200,qty:9800},{s:'MP005',rev:150000,qty:7000},{s:'MS007',rev:135150,qty:8350},{s:'AB231H',rev:125800,qty:7400},{s:'AB404H',rev:124100,qty:7300},{s:'JA800',rev:112500,qty:4500},{s:'MP006',rev:110000,qty:5000},{s:'IP240P',rev:109857,qty:6900},{s:'MS008',rev:105400,qty:6200},{s:'MS010',rev:88000,qty:5500}]},
+  'SHOWROOM':   {total:3093277, top:[{s:'AS001T',rev:241697,qty:15227},{s:'DP790-26',rev:215453,qty:11225},{s:'DP433-26',rev:172178,qty:9062},{s:'JT001',rev:109833,qty:5158},{s:'DP601-26',rev:93902,qty:4878},{s:'BP239J',rev:77214,qty:2271},{s:'DP697-BO',rev:60000,qty:2400},{s:'BP473J',rev:59806,qty:1560},{s:'BP433J',rev:53496,qty:1486},{s:'BP460J',rev:52826,qty:1377}]},
+  'WEB ORDER':  {total:652392,  top:[{s:'BP433J',rev:51909,qty:1331},{s:'BP473J',rev:50651,qty:1207},{s:'DP786',rev:42160,qty:1592},{s:'JT001',rev:24888,qty:1037},{s:'BP471J-A',rev:22446,qty:522},{s:'BP471N',rev:19352,qty:472},{s:'BP453J-A',rev:15498,qty:369},{s:'DH880-T',rev:14784,qty:672},{s:'BP460J',rev:14576,qty:352},{s:'DP716',rev:14400,qty:600}]},
+  'FASHION GO': {total:458258,  top:[{s:'BP433J',rev:43485,qty:1115},{s:'JT001',rev:26232,qty:1093},{s:'BP473J',rev:22911,qty:555},{s:'BP435J-A',rev:19619,qty:448},{s:'DP689',rev:19224,qty:642},{s:'BP472J',rev:15873,qty:407},{s:'BP333J',rev:14950,qty:366},{s:'BP524J',rev:14362,qty:334},{s:'BP333J-A',rev:12710,qty:310},{s:'BP435J',rev:11925,qty:279}]},
+  'E-MAIL ORDER':{total:17700,  top:[{s:'DP689',rev:14580,qty:540},{s:'DP683',rev:3120,qty:120}]},
+};
+const SO_TYPE_COLS={'IN-HOUSE':P.blue,'SHOWROOM':P.purple,'WEB ORDER':P.green,'FASHION GO':P.orange,'E-MAIL ORDER':P.pink};
+
+// ── PERIOD FILTER DATA (Invoice basis) ───────────────────
+const PERIOD_DATA={
+  '30d':{rev:3587109,invoices:3677,customers:1704,label:'Last 30 Days',
+    top10:[{s:'JT001',rev:158098,qty:7910},{s:'BP433J',rev:131094,qty:3521},{s:'BP460J',rev:74619,qty:1896},{s:'IP554',rev:70968,qty:5352},{s:'MP800A',rev:70704,qty:2946},{s:'BP333J',rev:63558,qty:1665},{s:'BP468J',rev:63009,qty:1659},{s:'BP353J',rev:60796,qty:1747},{s:'IP239',rev:54250,qty:3799},{s:'BP511J',rev:52978,qty:1282}],
+    monthly:{'2026-03':3587109}},
+  '90d':{rev:10053937,invoices:9084,customers:2574,label:'Last 90 Days',
+    top10:[{s:'JT001',rev:481988,qty:23480},{s:'BP433J',rev:365247,qty:9777},{s:'BP460J',rev:218473,qty:5537},{s:'BP473J',rev:205617,qty:5239},{s:'BP353J',rev:184029,qty:5244},{s:'IP554',rev:179342,qty:13525},{s:'BP370J-A',rev:165918,qty:4475},{s:'BP333J',rev:154971,qty:4048},{s:'IP239',rev:142934,qty:9922},{s:'AS001T',rev:137053,qty:9696}],
+    monthly:{'2026-01':3460594,'2026-02':3006234,'2026-03':3587109}},
+  'ytd':{rev:10053937,invoices:9084,customers:2574,label:'Year to Date',
+    top10:[{s:'JT001',rev:481988,qty:23480},{s:'BP433J',rev:365247,qty:9777},{s:'BP460J',rev:218473,qty:5537},{s:'BP473J',rev:205617,qty:5239},{s:'BP353J',rev:184029,qty:5244},{s:'IP554',rev:179342,qty:13525},{s:'BP370J-A',rev:165918,qty:4475},{s:'BP333J',rev:154971,qty:4048},{s:'IP239',rev:142934,qty:9922},{s:'AS001T',rev:137053,qty:9696}],
+    monthly:{'2026-01':3460594,'2026-02':3006234,'2026-03':3587109}},
+  'all':{rev:76082555,invoices:67013,customers:7158,label:'All Time',
+    top10:[{s:'BP433J',rev:2920992,qty:79300},{s:'BP473J',rev:1881189,qty:48625},{s:'BP353J',rev:1749996,qty:50472},{s:'BP460J',rev:1413966,qty:37314},{s:'BP339J',rev:1179495,qty:32423},{s:'AB237',rev:1176349,qty:61713},{s:'BP370J-A',rev:1098065,qty:30004},{s:'JT001',rev:1097007,qty:56146},{s:'BP333J',rev:1094524,qty:29811},{s:'DP683',rev:1055095,qty:40479}],
+    monthly:{'2025-02':2757015,'2025-03':2701108,'2025-04':3219460,'2025-05':2973387,'2025-06':2806347,'2025-07':3508309,'2025-08':3534050,'2025-09':3568357,'2025-10':4171622,'2025-11':2740810,'2025-12':1886715,'2026-01':3460594,'2026-02':3006234,'2026-03':3587109}},
+};
+
+// Period-filtered data for Best/Worst/Channel/Customer reports
+const PD_BEST={
+  '30d':{rev:[{s:'JT001',rev:158098,qty:7910},{s:'BP433J',rev:131094,qty:3521},{s:'BP460J',rev:74619,qty:1896},{s:'IP554',rev:70968,qty:5352},{s:'MP800A',rev:70704,qty:2946},{s:'BP333J',rev:63558,qty:1665},{s:'BP468J',rev:63009,qty:1659},{s:'BP353J',rev:60796,qty:1747},{s:'IP239',rev:54250,qty:3799},{s:'BP511J',rev:52978,qty:1282},{s:'BP457J',rev:50981,qty:1346},{s:'IP234-A',rev:49584,qty:3099},{s:'DP786',rev:49202,qty:1786},{s:'BP370J-A',rev:49026,qty:1333},{s:'DP791',rev:47196,qty:1651},{s:'AB404H',rev:44319,qty:2607},{s:'JH688',rev:43620,qty:2361},{s:'BP494J',rev:40744,qty:1069},{s:'BP473J',rev:37854,qty:971},{s:'BH404J',rev:36151,qty:1246}],qty:[{s:'JT001',qty:7910,rev:158098},{s:'IP554',qty:5352,rev:70968},{s:'IP239',qty:3799,rev:54250},{s:'BP433J',qty:3521,rev:131094},{s:'IP234-A',qty:3099,rev:49584},{s:'MP800A',qty:2946,rev:70704},{s:'AB404H',qty:2607,rev:44319},{s:'JH688',qty:2361,rev:43620},{s:'IP366J',qty:2101,rev:31515},{s:'AB265',qty:2001,rev:36018},{s:'BP460J',qty:1896,rev:74619},{s:'DP786',qty:1786,rev:49202},{s:'BP353J',qty:1747,rev:60796},{s:'BP333J',qty:1665,rev:63558},{s:'BP468J',qty:1659,rev:63009},{s:'DP791',qty:1651,rev:47196},{s:'AB456K',qty:1501,rev:29270},{s:'BP457J',qty:1346,rev:50981},{s:'BP370J-A',qty:1333,rev:49026},{s:'BP511J',qty:1282,rev:52978}]},
+  '90d':{rev:[{s:'JT001',rev:481988,qty:23480},{s:'BP433J',rev:365247,qty:9777},{s:'BP460J',rev:218473,qty:5537},{s:'BP473J',rev:205617,qty:5239},{s:'BP353J',rev:184029,qty:5244},{s:'IP554',rev:179342,qty:13525},{s:'BP370J-A',rev:165918,qty:4475},{s:'BP333J',rev:154971,qty:4048},{s:'IP239',rev:142934,qty:9922},{s:'AS001T',rev:137053,qty:9696},{s:'BH404J',rev:134415,qty:4532},{s:'BP468J',rev:128588,qty:3389},{s:'BP484J',rev:124772,qty:3007},{s:'DP791',rev:115809,qty:4106},{s:'BP471N',rev:110183,qty:2788},{s:'BP435J-A',rev:108768,qty:2588},{s:'DP689',rev:107307,qty:3866},{s:'JP240',rev:104395,qty:5031},{s:'BP203J',rev:102348,qty:2515},{s:'BP457J',rev:95329,qty:2530}],qty:[{s:'JT001',qty:23480,rev:481988},{s:'IP554',qty:13525,rev:179342},{s:'IP239',qty:9922,rev:142934},{s:'BP433J',qty:9777,rev:365247},{s:'AS001T',qty:9696,rev:137053},{s:'BP460J',qty:5537,rev:218473},{s:'BP353J',qty:5244,rev:184029},{s:'BP473J',qty:5239,rev:205617},{s:'JP240',qty:5031,rev:104395},{s:'BH404J',qty:4532,rev:134415},{s:'BP370J-A',qty:4475,rev:165918},{s:'IP372',qty:4229,rev:57092},{s:'DP791',qty:4106,rev:115809},{s:'BP333J',qty:4048,rev:154971},{s:'JK386',qty:4045,rev:75831},{s:'JP386',qty:3907,rev:83359},{s:'DP689',qty:3866,rev:107307},{s:'AB231H',qty:3805,rev:63684},{s:'AB404H',qty:3609,rev:60351},{s:'DH764',qty:3514,rev:69043}]},
+  'ytd':{rev:[{s:'JT001',rev:481988,qty:23480},{s:'BP433J',rev:365247,qty:9777},{s:'BP460J',rev:218473,qty:5537},{s:'BP473J',rev:205617,qty:5239},{s:'BP353J',rev:184029,qty:5244},{s:'IP554',rev:179342,qty:13525},{s:'BP370J-A',rev:165918,qty:4475},{s:'BP333J',rev:154971,qty:4048},{s:'IP239',rev:142934,qty:9922},{s:'AS001T',rev:137053,qty:9696},{s:'BH404J',rev:134415,qty:4532},{s:'BP468J',rev:128588,qty:3389},{s:'BP484J',rev:124772,qty:3007},{s:'DP791',rev:115809,qty:4106},{s:'BP471N',rev:110183,qty:2788},{s:'BP435J-A',rev:108768,qty:2588},{s:'DP689',rev:107307,qty:3866},{s:'JP240',rev:104395,qty:5031},{s:'BP203J',rev:102348,qty:2515},{s:'BP457J',rev:95329,qty:2530}],qty:[{s:'JT001',qty:23480,rev:481988},{s:'IP554',qty:13525,rev:179342},{s:'IP239',qty:9922,rev:142934},{s:'BP433J',qty:9777,rev:365247},{s:'AS001T',qty:9696,rev:137053},{s:'BP460J',qty:5537,rev:218473},{s:'BP353J',qty:5244,rev:184029},{s:'BP473J',qty:5239,rev:205617},{s:'JP240',qty:5031,rev:104395},{s:'BH404J',qty:4532,rev:134415},{s:'BP370J-A',qty:4475,rev:165918},{s:'IP372',qty:4229,rev:57092},{s:'DP791',qty:4106,rev:115809},{s:'BP333J',qty:4048,rev:154971},{s:'JK386',qty:4045,rev:75831},{s:'JP386',qty:3907,rev:83359},{s:'DP689',qty:3866,rev:107307},{s:'AB231H',qty:3805,rev:63684},{s:'AB404H',qty:3609,rev:60351},{s:'DH764',qty:3514,rev:69043}]},
+  'all':{rev:[{s:'BP433J',rev:2920992,qty:79300},{s:'BP473J',rev:1881189,qty:48625},{s:'BP353J',rev:1749996,qty:50472},{s:'BP460J',rev:1413966,qty:37314},{s:'BP339J',rev:1179495,qty:32423},{s:'AB237',rev:1176349,qty:61713},{s:'BP370J-A',rev:1098065,qty:30004},{s:'JT001',rev:1097007,qty:56146},{s:'BP333J',rev:1094524,qty:29811},{s:'DP683',rev:1055095,qty:40479},{s:'BP468J',rev:1024648,qty:27253},{s:'BP370J',rev:975287,qty:26793},{s:'BP450J',rev:932031,qty:24701},{s:'DP689',rev:815401,qty:31058},{s:'BP239J',rev:757446,qty:22052},{s:'BP471N',rev:752160,qty:19221},{s:'DP790',rev:732560,qty:28161},{s:'JP240',rev:706134,qty:35005},{s:'DP649',rev:662877,qty:26023},{s:'BH404J',rev:629407,qty:22591}],qty:[{s:'BP433J',qty:79300,rev:2920992},{s:'AB237',qty:61713,rev:1176349},{s:'JT001',qty:56146,rev:1097007},{s:'BP353J',qty:50472,rev:1749996},{s:'BP473J',qty:48625,rev:1881189},{s:'DP683',qty:40479,rev:1055095},{s:'BP460J',qty:37314,rev:1413966},{s:'JP240',qty:35005,rev:706134},{s:'BP339J',qty:32423,rev:1179495},{s:'DP689',qty:31058,rev:815401},{s:'BP370J-A',qty:30004,rev:1098065},{s:'BP333J',qty:29811,rev:1094524},{s:'DP790',qty:28161,rev:732560},{s:'BP468J',qty:27253,rev:1024648},{s:'BP370J',qty:26793,rev:975287},{s:'DP649',qty:26023,rev:662877},{s:'JP239',qty:24957,rev:492036},{s:'BP450J',qty:24701,rev:932031},{s:'IP239',qty:23967,rev:346309},{s:'AB213',qty:23123,rev:439638}]},
+};
+const PD_WORST={
+  '30d':[{s:'JP197',rev:10,qty:1},{s:'JH312',rev:12,qty:1},{s:'JP138',rev:15,qty:1},{s:'JP159',rev:15,qty:1},{s:'DP555N',rev:20,qty:1},{s:'DP526',rev:25,qty:1},{s:'DP787',rev:26,qty:1},{s:'BP21J',rev:29,qty:1},{s:'JP158',rev:30,qty:2},{s:'BP385J-A',rev:32,qty:1},{s:'JP125',rev:34,qty:2},{s:'BP519J',rev:36,qty:1},{s:'JP381',rev:38,qty:2}],
+  '90d':[{s:'JH316N',rev:18,qty:1},{s:'DP677',rev:19,qty:1},{s:'DP501J-C',rev:20,qty:1},{s:'DP662N',rev:25,qty:1},{s:'BK445J',rev:27,qty:1},{s:'JP197',rev:30,qty:3},{s:'JP159',rev:30,qty:2},{s:'BP334J',rev:34,qty:1},{s:'BP449J',rev:35,qty:1},{s:'JH312',rev:36,qty:3},{s:'DP555N',rev:40,qty:2},{s:'BP393J-C',rev:40,qty:1},{s:'JH354',rev:48,qty:4}],
+  'ytd':[{s:'JH316N',rev:18,qty:1},{s:'DP677',rev:19,qty:1},{s:'DP501J-C',rev:20,qty:1},{s:'DP662N',rev:25,qty:1},{s:'BK445J',rev:27,qty:1},{s:'JP197',rev:30,qty:3},{s:'JP159',rev:30,qty:2},{s:'BP334J',rev:34,qty:1},{s:'BP449J',rev:35,qty:1},{s:'JH312',rev:36,qty:3},{s:'DP555N',rev:40,qty:2},{s:'BP393J-C',rev:40,qty:1},{s:'JH354',rev:48,qty:4}],
+  'all':[{s:'DP430',rev:18,qty:1},{s:'AB826',rev:18,qty:1},{s:'BP241J',rev:19,qty:1},{s:'JP235',rev:19,qty:1},{s:'DP651N',rev:25,qty:1},{s:'BP205J',rev:25,qty:1},{s:'BP237J',rev:25,qty:1},{s:'BP351J-A',rev:25,qty:1},{s:'BP227J',rev:25,qty:1},{s:'DA527N',rev:28,qty:1},{s:'BP97J',rev:31,qty:1},{s:'BP96J',rev:34,qty:2},{s:'BP271J',rev:34,qty:1}],
+};
+const PD_CH={
+  '30d':{INHOUSE:[{s:'JT001',rev:99846},{s:'IP554',rev:70968},{s:'MP800A',rev:70704},{s:'IP239',rev:54250},{s:'IP234-A',rev:49584},{s:'AB404H',rev:44319},{s:'BP433J',rev:37005},{s:'AB265',rev:36018},{s:'BP333J',rev:33704},{s:'IP366J',rev:31515}],FASHIONGO:[{s:'BP435J-A',rev:20219},{s:'BP468J',rev:12560},{s:'BP435J',rev:11088},{s:'BP472J',rev:9633},{s:'DP791',rev:9540},{s:'BP433J',rev:9204},{s:'BP460J',rev:9151},{s:'BP333J',rev:8405},{s:'DP790',rev:7579},{s:'JT001',rev:7455}],WEB:[{s:'BP433J',rev:46293},{s:'BP511J',rev:22360},{s:'BP460J',rev:19740},{s:'DP791',rev:16890},{s:'BP494J',rev:15400},{s:'BH536J',rev:15360},{s:'BP457J',rev:13880},{s:'BP473J',rev:12956},{s:'BP353J',rev:12617},{s:'BP370J-A',rev:11973}],TRADESHOW:[]},
+  '90d':{INHOUSE:[{s:'JT001',rev:258714},{s:'IP554',rev:179342},{s:'IP239',rev:142934},{s:'AS001T',rev:137053},{s:'BP473J',rev:104455},{s:'BP433J',rev:100185},{s:'BP333J',rev:85714},{s:'BP484J',rev:77654},{s:'BP370J-A',rev:76392},{s:'MP800A',rev:70704}],FASHIONGO:[{s:'JT001',rev:44567},{s:'BP433J',rev:37791},{s:'BP435J-A',rev:30496},{s:'BP333J',rev:27938},{s:'DP689',rev:26972},{s:'BP435J',rev:26124},{s:'BP460J',rev:22271},{s:'BP472J',rev:20124},{s:'DP791',rev:18870},{s:'BP468J',rev:16920}],WEB:[{s:'BP433J',rev:133887},{s:'BP460J',rev:81240},{s:'BP353J',rev:64048},{s:'BP473J',rev:54121},{s:'BP471N',rev:49487},{s:'JT001',rev:49116},{s:'BP203J',rev:39162},{s:'DP791',rev:38184},{s:'BH404J',rev:36868},{s:'BP511J',rev:35737}],TRADESHOW:[]},
+  'ytd':{INHOUSE:[{s:'JT001',rev:258714},{s:'IP554',rev:179342},{s:'IP239',rev:142934},{s:'AS001T',rev:137053},{s:'BP473J',rev:104455},{s:'BP433J',rev:100185},{s:'BP333J',rev:85714},{s:'BP484J',rev:77654},{s:'BP370J-A',rev:76392},{s:'MP800A',rev:70704}],FASHIONGO:[{s:'JT001',rev:44567},{s:'BP433J',rev:37791},{s:'BP435J-A',rev:30496},{s:'BP333J',rev:27938},{s:'DP689',rev:26972},{s:'BP435J',rev:26124},{s:'BP460J',rev:22271},{s:'BP472J',rev:20124},{s:'DP791',rev:18870},{s:'BP468J',rev:16920}],WEB:[{s:'BP433J',rev:133887},{s:'BP460J',rev:81240},{s:'BP353J',rev:64048},{s:'BP473J',rev:54121},{s:'BP471N',rev:49487},{s:'JT001',rev:49116},{s:'BP203J',rev:39162},{s:'DP791',rev:38184},{s:'BH404J',rev:36868},{s:'BP511J',rev:35737}],TRADESHOW:[]},
+  'all':{INHOUSE:[{s:'BP433J',rev:1376032},{s:'AB237',rev:1176349},{s:'BP353J',rev:921523},{s:'BP473J',rev:882884},{s:'BP333J',rev:727425},{s:'BP460J',rev:724508},{s:'JT001',rev:703956},{s:'BP370J',rev:624488},{s:'BP339J',rev:593870},{s:'BP239J',rev:533399}],FASHIONGO:[{s:'DP649',rev:112487},{s:'DP683',rev:111169},{s:'DP689',rev:90627},{s:'DP674',rev:82167},{s:'BP433J',rev:81272},{s:'JT001',rev:79205},{s:'DH807',rev:53044},{s:'DP790',rev:51324},{s:'BP472J',rev:47268},{s:'BP333J',rev:44404}],WEB:[{s:'BP433J',rev:1040799},{s:'BP353J',rev:484880},{s:'BP473J',rev:454614},{s:'BP339J',rev:352503},{s:'BP460J',rev:318028},{s:'BP450J',rev:265336},{s:'BP471N',rev:242825},{s:'DP683',rev:212268},{s:'BP370J-A',rev:204144},{s:'DP649',rev:189153}],TRADESHOW:[{s:'BP473J',rev:379895},{s:'BP468J',rev:226878},{s:'BP353J',rev:219481},{s:'BP460J',rev:210654},{s:'BP433J',rev:200367},{s:'BP370J-A',rev:185672},{s:'BP471N',rev:157619},{s:'DP790',rev:155075},{s:'DP683',rev:145947},{s:'BP339J',rev:142449}]},
+};
+const PD_CUST={
+  '30d':[{c:'STITCH FIX-HQ',rev:767072,styles:[{s:'IP554',rev:70968},{s:'MP800A',rev:70704},{s:'IP239',rev:54250},{s:'IP234-A',rev:49584},{s:'AB404H',rev:44319}]},{c:'BOBBLES & LACE MIA',rev:70957,styles:[{s:'BP435J-A',rev:11840},{s:'BP468J',rev:10880},{s:'BP435J',rev:8316},{s:'BP333J',rev:6929},{s:'DP791',rev:2910}]},{c:'JUST BLACK DENIM INC',rev:62758,styles:[{s:'BP473J',rev:6726},{s:'BP353J',rev:6052},{s:'BP433J',rev:5364},{s:'BP468J',rev:3219},{s:'BP484J',rev:3198}]},{c:'NATI',rev:60273,styles:[{s:'BP239J-A',rev:11730},{s:'BP333J',rev:10452},{s:'BP239J',rev:9962},{s:'BP494J',rev:9139},{s:'BP298J',rev:7480}]},{c:'BOHME',rev:47460,styles:[{s:'DP786',rev:18900},{s:'DP797',rev:18200},{s:'DA813',rev:10360}]},{c:'THE PAPER STORE',rev:38448,styles:[{s:'BP353J',rev:10948},{s:'DH880',rev:9500},{s:'JH692',rev:9000},{s:'JH688',rev:9000}]},{c:'PANTS STORE',rev:37083,styles:[{s:'JT001',rev:13608},{s:'BP239J-A',rev:6732},{s:'JP240',rev:3432},{s:'DP786',rev:3159},{s:'DP790',rev:2592}]},{c:'NUULY',rev:35040,styles:[{s:'DH822-L',rev:13200},{s:'DH817',rev:13156},{s:'JH427',rev:8358},{s:'BH522J',rev:64},{s:'DH880-T',rev:44}]},{c:'THE WILLOW TREE-5',rev:32827,styles:[{s:'DP783',rev:8694},{s:'BP539J',rev:5180},{s:'DP697',rev:3780},{s:'DP690-A',rev:3618},{s:'BP433J',rev:3492}]},{c:'VESTIQUE-WAREHOUSE',rev:32550,styles:[{s:'JT001',rev:32550}]}],
+  '90d':[{c:'STITCH FIX-HQ',rev:2109926,styles:[{s:'IP554',rev:179342},{s:'IP239',rev:142934},{s:'MP800A',rev:70704},{s:'AB231H',rev:63684},{s:'AB404H',rev:60351}]},{c:'ALTARD STATE',rev:315991,styles:[{s:'AS001T',rev:137053},{s:'DP790-25',rev:42860},{s:'AS404H',rev:39468},{s:'DH829-26',rev:34675},{s:'JP386',rev:22952}]},{c:'NUULY',rev:281591,styles:[{s:'BP203J',rev:31416},{s:'BP436N',rev:27216},{s:'BP429N',rev:26145},{s:'BP435J-A',rev:25714},{s:'BP471N-A',rev:25714}]},{c:'NATI',rev:178792,styles:[{s:'BP484J',rev:30832},{s:'BP473J',rev:24928},{s:'BP239J',rev:23732},{s:'BP333J',rev:21660},{s:'BP239J-A',rev:20502}]},{c:'JUST BLACK DENIM INC',rev:163993,styles:[{s:'BP433J',rev:14328},{s:'BP473J',rev:10678},{s:'BP353J',rev:8738},{s:'BP484J',rev:6642},{s:'BP471N',rev:5966}]},{c:'PANTS STORE',rev:151137,styles:[{s:'JT001',rev:28833},{s:'BP239J-A',rev:11968},{s:'BP521J',rev:8316},{s:'BP435J',rev:7722},{s:'DP683',rev:7548}]},{c:'BOBBLES & LACE MIA',rev:150783,styles:[{s:'BP333J',rev:21296},{s:'BP435J-A',rev:20182},{s:'BP435J',rev:17220},{s:'BP468J',rev:10880},{s:'DP689',rev:10444}]},{c:'THE PAPER STORE',rev:129063,styles:[{s:'BP353J',rev:21148},{s:'DP674',rev:20655},{s:'BP433J',rev:14688},{s:'DP683',rev:10608},{s:'BH205J-A',rev:9889}]},{c:'BOHME',rev:114682,styles:[{s:'DP797',rev:32916},{s:'DP786',rev:18900},{s:'DP783',rev:15600},{s:'DA813',rev:10360},{s:'DP887C',rev:9702}]},{c:'SHOP AVARA',rev:107350,styles:[{s:'BP474J',rev:15600},{s:'DP676',rev:13500},{s:'BP511J',rev:11700},{s:'BP203J',rev:11400},{s:'BP460J',rev:11100}]}],
+  'ytd':[{c:'STITCH FIX-HQ',rev:2109926,styles:[{s:'IP554',rev:179342},{s:'IP239',rev:142934},{s:'MP800A',rev:70704},{s:'AB231H',rev:63684},{s:'AB404H',rev:60351}]},{c:'ALTARD STATE',rev:315991,styles:[{s:'AS001T',rev:137053},{s:'DP790-25',rev:42860},{s:'AS404H',rev:39468},{s:'DH829-26',rev:34675},{s:'JP386',rev:22952}]},{c:'NUULY',rev:281591,styles:[{s:'BP203J',rev:31416},{s:'BP436N',rev:27216},{s:'BP429N',rev:26145},{s:'BP435J-A',rev:25714},{s:'BP471N-A',rev:25714}]},{c:'NATI',rev:178792,styles:[{s:'BP484J',rev:30832},{s:'BP473J',rev:24928},{s:'BP239J',rev:23732},{s:'BP333J',rev:21660},{s:'BP239J-A',rev:20502}]},{c:'JUST BLACK DENIM INC',rev:163993,styles:[{s:'BP433J',rev:14328},{s:'BP473J',rev:10678},{s:'BP353J',rev:8738},{s:'BP484J',rev:6642},{s:'BP471N',rev:5966}]},{c:'PANTS STORE',rev:151137,styles:[{s:'JT001',rev:28833},{s:'BP239J-A',rev:11968},{s:'BP521J',rev:8316},{s:'BP435J',rev:7722},{s:'DP683',rev:7548}]},{c:'BOBBLES & LACE MIA',rev:150783,styles:[{s:'BP333J',rev:21296},{s:'BP435J-A',rev:20182},{s:'BP435J',rev:17220},{s:'BP468J',rev:10880},{s:'DP689',rev:10444}]},{c:'THE PAPER STORE',rev:129063,styles:[{s:'BP353J',rev:21148},{s:'DP674',rev:20655},{s:'BP433J',rev:14688},{s:'DP683',rev:10608},{s:'BH205J-A',rev:9889}]},{c:'BOHME',rev:114682,styles:[{s:'DP797',rev:32916},{s:'DP786',rev:18900},{s:'DP783',rev:15600},{s:'DA813',rev:10360},{s:'DP887C',rev:9702}]},{c:'SHOP AVARA',rev:107350,styles:[{s:'BP474J',rev:15600},{s:'DP676',rev:13500},{s:'BP511J',rev:11700},{s:'BP203J',rev:11400},{s:'BP460J',rev:11100}]}],
+  'all':[{c:'STITCH FIX-HQ',rev:20590241,styles:[{s:'AB237',rev:1176349},{s:'AB213',rev:439638},{s:'AB996',rev:387964},{s:'IP239',rev:346309},{s:'SF428J-10',rev:317604}]},{c:'ALTARD STATE',rev:2396636,styles:[{s:'DP649-25',rev:223450},{s:'AS001T',rev:163689},{s:'DP790-25',rev:163550},{s:'DP649-24',rev:161580},{s:'JT001',rev:118576}]},{c:'NATI',rev:1571381,styles:[{s:'BP433J',rev:277200},{s:'BP239J',rev:245990},{s:'BP333J',rev:208968},{s:'BP473J',rev:200146},{s:'BP446N',rev:129528}]},{c:'JUST BLACK DENIM INC',rev:1379578,styles:[{s:'BP433J',rev:64080},{s:'BP353J',rev:58126},{s:'BP473J',rev:56124},{s:'BP339J',rev:41091},{s:'BP450J',rev:37911}]},{c:'NUULY',rev:1066827,styles:[{s:'BP436N',rev:60900},{s:'DP597N',rev:59716},{s:'BP473J',rev:42271},{s:'BP440J-A',rev:38114},{s:'BP333J-A',rev:34782}]},{c:'BOHME',rev:959920,styles:[{s:'DP697-BO',rev:106000},{s:'DP797',rev:76908},{s:'BP473J',rev:56160},{s:'DP799',rev:50596},{s:'DP791',rev:38136}]},{c:'LULUS-COM',rev:952038,styles:[{s:'BP304J',rev:142938},{s:'JH305',rev:68601},{s:'BP358J',rev:57795},{s:'BP460J',rev:42227},{s:'BP361J',rev:39270}]},{c:'SHOP AVARA',rev:778732,styles:[{s:'BP433J',rev:247224},{s:'BP450J',rev:57387},{s:'DP790',rev:48675},{s:'BP203J',rev:26600},{s:'DP683',rev:23000}]},{c:'BOBBLES AND LACE',rev:772591,styles:[{s:'BP433J',rev:89604},{s:'BP473J',rev:66918},{s:'BP472J',rev:65376},{s:'BP435J',rev:59982},{s:'BP370J',rev:49032}]},{c:'STITCH AND FEATHER-H',rev:756837,styles:[{s:'BP353J',rev:42602},{s:'BP473J',rev:37582},{s:'BP460J',rev:33250},{s:'BP433J',rev:30456},{s:'BP420J',rev:29230}]}],
+};
+
+const CUST_STYLES=[
+  {c:'STITCH FIX-HQ',rev:5217028,styles:[{s:'MS006',rev:164200,qty:9800},{s:'MP005',rev:150000,qty:7000},{s:'MS007',rev:135150,qty:8350},{s:'AB231H',rev:125800,qty:7400},{s:'AB404H',rev:124100,qty:7300}]},
+  {c:'ALTARD STATE',rev:1050782,styles:[{s:'AS001T',rev:241697,qty:15227},{s:'DP790-26',rev:215453,qty:11225},{s:'DP433-26',rev:172178,qty:9062},{s:'DP601-26',rev:93902,qty:4878},{s:'DP649-26',rev:52220,qty:2611}]},
+  {c:'BOHME',rev:647176,styles:[{s:'DP697-BO',rev:60000,qty:2400},{s:'DP797',rev:36400,qty:1400},{s:'DP801N',rev:32400,qty:1200},{s:'DP896-BO',rev:32400,qty:1200},{s:'DP520J-BO',rev:32400,qty:1200}]},
+  {c:'NUULY',rev:298661,styles:[{s:'DH822-L',rev:46200,qty:2100},{s:'DH822',rev:24200,qty:1100},{s:'BP468J',rev:24050,qty:650},{s:'BP498J',rev:24050,qty:650},{s:'BH536J',rev:19200,qty:600}]},
+  {c:'PANTS STORE',rev:273937,styles:[{s:'JT001',rev:26649,qty:1269},{s:'DP683',rev:18289,qty:692},{s:'BP460J',rev:17024,qty:448},{s:'BP239J-A',rev:16320,qty:480},{s:'BP435J-A',rev:15840,qty:396}]},
+  {c:'VESTIQUE-WAREHOUSE',rev:195742,styles:[{s:'DP865',rev:11529,qty:427},{s:'DP597N-A',rev:10179,qty:377},{s:'BA622J',rev:9360,qty:156},{s:'JT001',rev:7560,qty:360},{s:'DP879',rev:6669,qty:247}]},
+  {c:'BOBBLES & LACE MIA',rev:119105,styles:[{s:'BP435J-A',rev:16373,qty:374},{s:'BP433J',rev:16068,qty:412},{s:'DP689',rev:10230,qty:341},{s:'BP524J',rev:9804,qty:228},{s:'BP353J',rev:7833,qty:211}]},
+  {c:'THE WILLOW TREE-5',rev:113783,styles:[{s:'DP783',rev:14472,qty:536},{s:'BP471J-A',rev:8487,qty:207},{s:'DP790',rev:7236,qty:268},{s:'BP433J',rev:6948,qty:193},{s:'DP690-A',rev:6210,qty:230}]},
+  {c:'NATI',rev:109027,styles:[{s:'BP239J',rev:44608,qty:1312},{s:'BP473J',rev:19380,qty:510},{s:'BP484J',rev:11152,qty:272},{s:'BP333J',rev:10032,qty:264},{s:'BP239J-A',rev:8772,qty:258}]},
+  {c:'STITCH AND FEATHER-H',rev:81252,styles:[{s:'BP473J',rev:15504,qty:408},{s:'BP484J',rev:5904,qty:144},{s:'BP435J',rev:5616,qty:144},{s:'BP468J',rev:5328,qty:144},{s:'BP600J',rev:5328,qty:144}]}
+];
+
+const QTR_DATA=[
+  {s:'JT001',   qtrs:{'2025-Q1':0,    '2025-Q2':5760, '2025-Q3':31669,'2025-Q4':33732,'2026-Q1':350892}},
+  {s:'BP433J',  qtrs:{'2025-Q1':936,  '2025-Q2':390,  '2025-Q3':21822,'2025-Q4':15633,'2026-Q1':245061}},
+  {s:'BP473J',  qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':12087,'2025-Q4':20737,'2026-Q1':208792}},
+  {s:'BP460J',  qtrs:{'2025-Q1':0,    '2025-Q2':492,  '2025-Q3':3684, '2025-Q4':22676,'2026-Q1':154128}},
+  {s:'DP783',   qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':32548,'2025-Q4':7518, '2026-Q1':128631}},
+  {s:'BP471N',  qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':9630, '2025-Q4':17280,'2026-Q1':104052}},
+  {s:'DP786',   qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':19800,'2025-Q4':7200, '2026-Q1':94205}},
+  {s:'BP468J',  qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':14256,'2025-Q4':9504, '2026-Q1':96313}},
+  {s:'BP370J-A',qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':10800,'2025-Q4':15665,'2026-Q1':91000}},
+  {s:'BP239J',  qtrs:{'2025-Q1':0,    '2025-Q2':0,    '2025-Q3':22000,'2025-Q4':0,    '2026-Q1':91062}},
+];
+const QTRS=['2025-Q1','2025-Q2','2025-Q3','2025-Q4','2026-Q1'];
+const QTR_COLS=[P.sky,P.teal,P.green,P.yellow,P.blue];
+
+// ── NEW REPORT FUNCTIONS ─────────────────────────────────
+let soTypeChart=null, csChart=null, qtrChart=null, soChart=null;
+let curPeriod='all';
+
+// Period dropdown handler — updates Overview KPIs + monthly chart
+let revChart=null;
+function setPd(v){
+  curPeriod=v;
+  const d=PERIOD_DATA[v];
+  if(!d) return;
+  // Update KPIs
+  const el=document.getElementById('ov-rev'); if(el) el.textContent=fK(d.rev);
+  const el2=document.getElementById('ov-inv'); if(el2) el2.textContent=d.invoices.toLocaleString();
+  const el3=document.getElementById('ov-inv-sub'); if(el3) el3.textContent=d.customers.toLocaleString()+' customers';
+  const el4=document.getElementById('ov-inv-lbl'); if(el4) el4.textContent='Invoices ('+d.label+')';
+  const el5=document.getElementById('ov-rev-sub'); if(el5) el5.textContent=d.label;
+  document.getElementById('pg-sub').textContent=d.label+' · Invoice basis';
+  // Redraw monthly revenue chart
+  if(revChart) revChart.destroy();
+  const mos=Object.keys(d.monthly), vals=Object.values(d.monthly);
+  const cEl=document.getElementById('c-rev');
+  if(cEl) revChart=new Chart(cEl,{type:'bar',data:{labels:mos,datasets:[{data:vals,backgroundColor:vals.map((_,i)=>i===vals.length-1?P.green:P.blue),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8}}}}}});
+  ci['overview']=false;
+  // Refresh period-aware reports if currently open
+  const activePg=document.querySelector('.page.active');
+  if(!activePg) return;
+  const pg=activePg.id.replace('pg-','');
+  if(pg==='best') updateBestSellers();
+  if(pg==='worst') renderWorst();
+  if(pg==='so-channel') updateSOType();
+  if(pg==='cust-style') updateCustStyle();
+}
+
+function updateSOType(){
+  const ot=document.getElementById('sotype-select').value;
+  // Map SO type dropdown to Invoice channel keys
+  const chMap={'IN-HOUSE':'INHOUSE','SHOWROOM':'INHOUSE','WEB ORDER':'WEB','FASHION GO':'FASHIONGO','E-MAIL ORDER':'FASHIONGO'};
+  // Use SO_TYPE_DATA for "all" period, PD_CH for filtered periods
+  let items, total;
+  if(curPeriod==='all'){
+    const d=SO_TYPE_DATA[ot];
+    items=d?d.top:[];
+    total=d?d.total:0;
+  } else {
+    const chKey=chMap[ot]||'INHOUSE';
+    const pd=PD_CH[curPeriod]||PD_CH['all'];
+    items=(pd[chKey]||[]).map(d=>({...d,qty:d.qty||0}));
+    total=items.reduce((a,d)=>a+d.rev,0);
+  }
+  const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
+  const col=SO_TYPE_COLS[ot]||P.blue;
+  const totalTop=items.reduce((a,r)=>a+r.rev,0);
+  document.getElementById('sotype-chart-hd').textContent=`Top Styles — ${ot} · ${pdLabel}`;
+  document.getElementById('sotype-tbl-hd').textContent=`${ot} · ${pdLabel} · Total: ${fK(total)}`;
+  document.getElementById('sotype-sub').textContent=`${fK(total)} total · ${items.length} top styles`;
+  if(soTypeChart) soTypeChart.destroy();
+  soTypeChart=new Chart(document.getElementById('c-sotype'),{
+    type:'bar',
+    data:{labels:items.map(d=>d.s),datasets:[{data:items.map(d=>d.rev),backgroundColor:col,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+  });
+  const tbody=document.getElementById('tb-sotype');
+  tbody.innerHTML='';
+  items.forEach((r,i)=>{
+    const share=totalTop>0?(r.rev/totalTop*100).toFixed(1):'—';
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td class="tr" style="font-weight:500">${fK(r.rev)}</td><td class="tr">${(r.qty||0).toLocaleString()}</td><td class="tr">${share}%</td></tr>`;
+  });
+}
+
+function initBestSO(){
+  if(soChart) return;
+  soChart = new Chart(document.getElementById('c-best-so'),{
+    type:'bar',
+    data:{labels:BEST20_SO.map(d=>d.s),datasets:[{data:BEST20_SO.map(d=>d.rev),backgroundColor:P.orange,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45}}}}
+  });
+  const tbody=document.getElementById('tb-best-so');
+  BEST20_SO.forEach((r,i)=>{
+    const avgOrd=Math.round(r.rev/r.orders);
+    const custTag=r.customers===1?'<span class="tag tr2">1 cust</span>':'';
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td class="tr" style="font-weight:500">${fK(r.rev)}</td><td class="tr">${r.qty.toLocaleString()}</td><td class="tr">${r.orders}</td><td class="tr">${r.customers} ${custTag}</td><td class="tr">${fK(avgOrd)}</td></tr>`;
+  });
+}
+
+function updateChannelBest(){
+  const ch=document.getElementById('ch-select').value;
+  const chLabel={'INHOUSE':'In-House','FASHIONGO':'FashionGo','WEB':'Web','TRADESHOW':'Trade Show'}[ch];
+  const data=CH_TOP10[ch]||[];
+  const col={'INHOUSE':P.blue,'FASHIONGO':P.purple,'WEB':P.green,'TRADESHOW':P.orange}[ch]||P.blue;
+  document.getElementById('ch-chart-hd').textContent=`Top 10 — ${chLabel}`;
+  document.getElementById('ch-tbl-hd').textContent=`${chLabel} Top 10 Detail`;
+  if(chChart) chChart.destroy();
+  chChart=new Chart(document.getElementById('c-ch-best'),{
+    type:'bar',
+    data:{labels:data.map(d=>d.s),datasets:[{data:data.map(d=>d.rev),backgroundColor:col,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+  });
+  const tbody=document.getElementById('tb-ch-best');
+  tbody.innerHTML='';
+  data.forEach((r,i)=>{tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td class="tr" style="font-weight:500">${fK(r.rev)}</td><td class="tr">${r.qty.toLocaleString()}</td></tr>`;});
+}
+
+function updateCustStyle(){
+  const idx=parseInt(document.getElementById('cust-select').value);
+  const pd=PD_CUST[curPeriod]||PD_CUST['all'];
+  const c=pd[idx]||pd[0];
+  const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
+  document.getElementById('cs-chart-hd').textContent=`Top Styles — ${c.c} · ${pdLabel}`;
+  document.getElementById('cs-tbl-hd').textContent=`Style Detail · Total Invoice: ${fK(c.rev)}`;
+  const totalRev=c.styles.reduce((a,s)=>a+s.rev,0);
+  if(csChart) csChart.destroy();
+  csChart=new Chart(document.getElementById('c-cust-style'),{
+    type:'bar',
+    data:{labels:c.styles.map(s=>s.s),datasets:[{data:c.styles.map(s=>s.rev),backgroundColor:[P.blue,P.green,P.orange,P.purple,P.pink],borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+  });
+  const tbody=document.getElementById('tb-cust-style');
+  tbody.innerHTML='';
+  c.styles.forEach((s,i)=>{
+    const share=(s.rev/totalRev*100).toFixed(1);
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${s.s}</strong></td><td class="tr" style="font-weight:500">${fK(s.rev)}</td><td class="tr">${s.qty.toLocaleString()}</td><td class="tr">${share}%</td></tr>`;
+  });
+}
+
+function initQtrTrend(){
+  if(qtrChart) return;
+  const datasets=QTR_DATA.map((d,i)=>({
+    label:d.s,
+    data:QTRS.map(q=>d.qtrs[q]||0),
+    backgroundColor:(QTR_COLS[i%QTR_COLS.length])+'CC',
+    borderRadius:3,
+    stack:'s'
+  }));
+  qtrChart=new Chart(document.getElementById('c-qtr'),{
+    type:'bar',
+    data:{labels:QTRS,datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:9},boxWidth:9,padding:6}}},scales:{y:{stacked:true,ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+  const tbody=document.getElementById('tb-qtr');
+  QTR_DATA.forEach(d=>{
+    const cells=QTRS.map(q=>{
+      const v=d.qtrs[q]||0;
+      return v>0?`<td class="tr" style="color:#212121">${fK(v)}</td>`:`<td class="tr" style="color:#bdbdbd">—</td>`;
+    }).join('');
+    tbody.innerHTML+=`<tr><td><strong>${d.s}</strong></td>${cells}</tr>`;
+  });
+}
+const TS_DATA = {
+  'DALLAS':       {'2023-06':{rev:12624,orders:19},'2023-08':{rev:638,orders:2},'2023-10':{rev:45595,orders:59},'2024-01':{rev:304357,orders:502},'2024-03':{rev:94105,orders:195},'2024-06':{rev:239614,orders:283},'2024-08':{rev:120074,orders:223},'2024-10':{rev:105586,orders:190},'2025-01':{rev:367261,orders:531},'2025-03':{rev:412929,orders:391},'2025-06':{rev:12912,orders:2},'2025-08':{rev:3994,orders:1,so:true},'2025-10':{rev:51420,orders:18,so:true},'2026-01':{rev:602953,orders:202,so:true},'2026-03':{rev:333265,orders:119,so:true}},
+  'ATLANTA':      {'2023-02':{rev:350,orders:1},'2023-08':{rev:840,orders:2},'2023-10':{rev:29763,orders:48},'2024-02':{rev:350047,orders:548},'2024-04':{rev:192547,orders:223},'2024-06':{rev:160725,orders:223},'2024-08':{rev:156314,orders:269},'2024-10':{rev:275047,orders:349},'2025-02':{rev:495613,orders:679},'2025-04':{rev:300987,orders:399},'2025-06':{rev:9783,orders:1},'2025-08':{rev:432,orders:1},'2025-10':{rev:240572,orders:23,so:true},'2026-02':{rev:508688,orders:175,so:true},'2026-04':{rev:244697,orders:51,so:true}},
+  'MAGIC-LV':     {'2024-02':{rev:508306,orders:671},'2024-08':{rev:555951,orders:764},'2025-02':{rev:1025985,orders:978},'2025-08':{rev:94707,orders:29},'2026-02':{rev:1640940,orders:313,so:true}},
+  'MAGIC-NY':     {'2022-09':{rev:581,orders:1},'2023-02':{rev:600,orders:2},'2023-09':{rev:44198,orders:62},'2024-02':{rev:225918,orders:444},'2024-09':{rev:276199,orders:471},'2025-02':{rev:317094,orders:540},'2025-09':{rev:96623,orders:35,so:true},'2026-02':{rev:380475,orders:140,so:true}},
+  'MAGIC-NASHVI': {'2024-04':{rev:185868,orders:241},'2025-04':{rev:426401,orders:368},'2025-10':{rev:29671,orders:17,so:true}},
+  'MAGIC-MIA':    {'2024-01':{rev:184493,orders:224}},
+  'SURF':         {'2024-01':{rev:41522,orders:74},'2024-09':{rev:30736,orders:63},'2025-01':{rev:127313,orders:182},'2025-09':{rev:12307,orders:5,so:true},'2026-01':{rev:158549,orders:39,so:true}},
+  'NORTHSTAR':    {'2023-06':{rev:340,orders:1},'2023-08':{rev:510,orders:1},'2023-10':{rev:2961,orders:8},'2024-01':{rev:19721,orders:36},'2024-03':{rev:15618,orders:39},'2024-06':{rev:31595,orders:58},'2024-08':{rev:10937,orders:30},'2024-10':{rev:40753,orders:73},'2025-01':{rev:13038,orders:32}},
+  'HAWAII':       {'2025-09':{rev:230994,orders:18,so:true}},
+  'FLAIRE':       {'2026-01':{rev:59809,orders:25,so:true}},
+  'CALA':         {'2025-09':{rev:3050,orders:2,so:true},'2026-03':{rev:9120,orders:6,so:true}},
+};
+const TS_COLORS = {
+  'DALLAS':'#1976D2','ATLANTA':'#4ADE80','MAGIC-LV':'#FB923C',
+  'MAGIC-NY':'#A78BFA','MAGIC-NASHVI':'#F472B6','MAGIC-MIA':'#F87171',
+  'SURF':'#38BDF8','NORTHSTAR':'#FCD34D','HAWAII':'#2DD4BF',
+  'FLAIRE':'#818CF8','CALA':'#86EFAC',
+};
+const TS_LABELS = {
+  'DALLAS':'Dallas','ATLANTA':'Atlanta','MAGIC-LV':'Magic LV',
+  'MAGIC-NY':'Magic NY','MAGIC-NASHVI':'Magic Nashville','MAGIC-MIA':'Magic Miami',
+  'SURF':'Surf','NORTHSTAR':'Northstar','HAWAII':'Hawaii',
+  'FLAIRE':'Flaire','CALA':'CALA',
+};
+
+let tsRevChart=null, tsOrdChart=null;
+
+function updateTsDetail(){
+  const show = document.getElementById('ts-select').value;
+  const data = TS_DATA[show];
+  if(!data) return;
+  const periods = Object.keys(data).sort();
+  const revs = periods.map(p=>data[p].rev);
+  const ords = periods.map(p=>data[p].orders);
+  const qtys = periods.map(p=>data[p].qty);
+  const total = revs.reduce((a,b)=>a+b,0);
+  const totalOrd = ords.reduce((a,b)=>a+b,0);
+  const bestP = periods[revs.indexOf(Math.max(...revs))];
+
+  document.getElementById('ts-total').textContent = fK(total);
+  document.getElementById('ts-count').textContent = totalOrd + ' orders';
+  document.getElementById('ts-best').textContent = bestP;
+  document.getElementById('ts-subtitle').textContent = TS_LABELS[show] + ' — Sales Order basis';
+  document.getElementById('ts-tbl-hd').textContent = TS_LABELS[show] + ' — Show Date Detail';
+
+  const yrs = [...new Set(periods.map(p=>p.split('-')[0]))].sort();
+  if(yrs.length >= 2){
+    const latYr = yrs[yrs.length-1], prevYr = yrs[yrs.length-2];
+    const latRev = periods.filter(p=>p.startsWith(latYr)).reduce((s,p)=>s+data[p].rev,0);
+    const prevRev = periods.filter(p=>p.startsWith(prevYr)).reduce((s,p)=>s+data[p].rev,0);
+    if(prevRev>0){
+      const pct = ((latRev-prevRev)/prevRev*100).toFixed(1);
+      const el = document.getElementById('ts-yoy');
+      el.textContent = (pct>0?'+':'')+pct+'%';
+      el.style.color = pct>0?'#43A047':'#E53935';
+    }
+  } else {
+    document.getElementById('ts-yoy').textContent = 'N/A';
+  }
+
+  const col = TS_COLORS[show]||'#1976D2';
+  if(tsRevChart) tsRevChart.destroy();
+  if(tsOrdChart) tsOrdChart.destroy();
+
+  tsRevChart = new Chart(document.getElementById('c-ts-rev'),{
+    type:'bar',
+    data:{labels:periods,datasets:[{label:'Revenue',data:revs,backgroundColor:col+'99',borderColor:col,borderWidth:1.5,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+
+  tsOrdChart = new Chart(document.getElementById('c-ts-ord'),{
+    type:'bar',
+    data:{labels:periods,datasets:[
+      {label:'Orders',data:ords,backgroundColor:col+'88',borderColor:col,borderWidth:1.5,borderRadius:4,yAxisID:'y'},
+      {label:'Units',data:qtys,backgroundColor:'#9E9E9E33',borderColor:'#9E9E9E',borderWidth:1,borderRadius:4,yAxisID:'y2'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:9},boxWidth:9}}},
+      scales:{
+        y:{ticks:{font:{size:8}},grid:{color:gc},title:{display:true,text:'Orders',font:{size:8}}},
+        y2:{position:'right',ticks:{callback:v=>v>=1000?Math.round(v/1000)+'K':v,font:{size:8}},grid:{display:false},title:{display:true,text:'Units',font:{size:8}}}
+      }
+    }
+  });
+
+  const tbody = document.getElementById('tb-ts-detail');
+  tbody.innerHTML='';
+  periods.forEach((p,i)=>{
+    const r=data[p].rev,o=data[p].orders,q=data[p].qty,avg=Math.round(r/o);
+    const prev=i>0?data[periods[i-1]].rev:null;
+    const vs=prev?((r-prev)/prev*100).toFixed(1):null;
+    const vsTxt=vs?`<span style="color:${vs>0?'#43A047':'#E53935'};font-weight:500">${vs>0?'+':''}${vs}%</span>`:'—';
+    const soTag = data[p].so ? ' <span class="tag tb">SO</span>' : '';
+    tbody.innerHTML+=`<tr><td><strong>${p}</strong>${soTag}</td><td class="tr">${fK(r)}</td><td class="tr">${o}</td><td class="tr">${q?q.toLocaleString():'—'}</td><td class="tr">${fK(avg)}</td><td class="tr">${vsTxt}</td></tr>`;
+  });
+}
+
+let tsBarChart=null, tsPieChart=null;
+function drawTsCompare(){
+  if(tsBarChart) return;
+  const shows = Object.keys(TS_DATA);
+  const totals = shows.map(s=>Object.values(TS_DATA[s]).reduce((a,d)=>a+d.rev,0));
+  const totalOrds = shows.map(s=>Object.values(TS_DATA[s]).reduce((a,d)=>a+d.orders,0));
+  const totalQtys = shows.map(s=>Object.values(TS_DATA[s]).reduce((a,d)=>a+d.qty,0));
+  const cols = shows.map(s=>TS_COLORS[s]||'#9E9E9E');
+
+  tsBarChart = new Chart(document.getElementById('c-ts-bar'),{
+    type:'bar',
+    data:{labels:shows.map(s=>TS_LABELS[s]),datasets:[{label:'Revenue (SO)',data:totals,backgroundColor:cols.map(c=>c+'CC'),borderColor:cols,borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:9}}}}}
+  });
+
+  tsPieChart = new Chart(document.getElementById('c-ts-pie'),{
+    type:'bar',
+    data:{
+      labels:shows.map(s=>TS_LABELS[s]),
+      datasets:[
+        {label:'Orders',data:totalOrds,backgroundColor:cols.map(c=>c+'CC'),borderRadius:3},
+        {label:'Units (÷10)',data:totalQtys.map(v=>Math.round(v/10)),backgroundColor:cols.map(c=>c+'44'),borderRadius:3},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:9},boxWidth:9}},
+        tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===1?` Units: ${(ctx.raw*10).toLocaleString()}`:` Orders: ${ctx.raw}`}}
+      },
+      scales:{y:{ticks:{font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9},maxRotation:30}}}
+    }
+  });
+}
+
 // ── CHARTS ───────────────────────────────────────────────
 const P={blue:'#1976D2',indigo:'#818CF8',green:'#4ADE80',teal:'#2DD4BF',yellow:'#FCD34D',orange:'#FB923C',pink:'#F472B6',purple:'#A78BFA',red:'#F87171',sky:'#38BDF8'};
 
 function drawCharts(pg){
   if(ci[pg])return;ci[pg]=true;
   if(pg==='overview'){
-    new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels:MONTHLY.map(d=>d.m),datasets:[{data:MONTHLY.map(d=>d.v),backgroundColor:MONTHLY.map((_,i)=>i===12?P.green:P.blue),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8}}}}}});
+    const pd=PERIOD_DATA[curPeriod]||PERIOD_DATA['all'];
+    const mos=Object.keys(pd.monthly), vals=Object.values(pd.monthly);
+    revChart=new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels:mos,datasets:[{data:vals,backgroundColor:vals.map((_,i)=>i===vals.length-1?P.green:P.blue),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8}}}}}});
     new Chart(document.getElementById('c-cat'),{type:'doughnut',data:{labels:['Pants','Short Pants','Skirts','Jacket','Other'],datasets:[{data:[126147910,18262329,4132952,2622378,7167188],backgroundColor:[P.blue,P.green,P.orange,P.purple,P.pink],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9,padding:6}}}}});
     new Chart(document.getElementById('c-chan'),{type:'bar',data:{labels:['Showroom','In-House','Web','Fashion Go','Trade Shows'],datasets:[{data:[15557541,13873242,6789494,1770439,7215600],backgroundColor:[P.blue,P.indigo,P.green,P.orange,P.purple],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:9}}}}}});
   }
   if(pg==='best'){
-    new Chart(document.getElementById('c-best'),{type:'bar',data:{labels:BEST20.map(d=>d.s),datasets:[{data:BEST20.map(d=>d.r),backgroundColor:BEST20.map(d=>d.c==='PANTS'?P.blue:d.c==='SHORT PANTS'?P.teal:P.orange),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45}}}}});
+    updateBestSellers();
+    return; // chart handled inside updateBestSellers
   }
   if(pg==='customers'){
+    // c-cust and c-custd drawn here, c-new-cust and c-funnel by initCustOverview
     new Chart(document.getElementById('c-cust'),{type:'bar',data:{labels:CUST_MO.map(d=>d.m),datasets:[{label:'Repeat',data:CUST_MO.map(d=>d.r),backgroundColor:P.blue,borderRadius:2,stack:'s'},{label:'New',data:CUST_MO.map(d=>d.n),backgroundColor:P.green,borderRadius:2,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:9},boxWidth:9}}},scales:{y:{stacked:true,grid:{color:gc},ticks:{font:{size:8}}},x:{stacked:true,grid:{display:false},ticks:{font:{size:8}}}}}});
     new Chart(document.getElementById('c-custd'),{type:'doughnut',data:{labels:['Repeat 66.3%','New 33.7%'],datasets:[{data:[4081,2078],backgroundColor:[P.blue,P.green],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9}}}}});
   }
@@ -685,6 +1815,315 @@ function drawCharts(pg){
   }
 }
 setTimeout(()=>drawCharts('overview'),80);
+setTimeout(()=>renderInsight('overview'),120);
+
+// ── INSIGHT BAR ──────────────────────────────────────────
+const INSIGHTS_KO = {
+  'overview': [
+    {col:'#1976D2', text:'<b>매출 집중도 극단적</b> — Top 10% 고객이 전체 매출의 81.8% 차지. Stitch Fix 단독으로 $20.6M (27%).'},
+    {col:'#43A047', text:'<b>3월 강세</b> — Mar 2026 $1.68M, MoM +31.4% 반등. 2025-12 저점 $576K 대비 +192% 회복.'},
+    {col:'#FB8C00', text:'<b>AR 위험</b> — Open AR $19.2M 중 72.5%($13.9M)가 90일+ 연체. 평균 회수일 141.8일로 업계 평균 초과.'},
+    {col:'#E53935', text:'<b>682개 PO 연체</b> — 1,076,210 units 입고 지연. 최대 89일 초과. 백오더 이행에 직접 영향.'},
+  ],
+  'best': [
+    {col:'#1976D2', text:'<b>BP353J 압도적 1위</b> — $4.26M, 123,941 units. 2위 BP433J($3.92M)와 $340K 격차. PANTS 카테고리가 전체의 80%.'},
+    {col:'#43A047', text:'<b>Top 5가 11%만 차지</b> — $158M 중 약 $17M. 매출이 비교적 분산된 구조. 2,091개 스타일이 골고루 팔림.'},
+    {col:'#FB8C00', text:'<b>SHORT PANTS 주목</b> — SF32H-3 60,992 units, JT001 56,146 units. 유닛 기준으로는 SKIRTS(CD123K 61K)도 상위권.'},
+    {col:'#9E9E9E', text:'<b>QTY vs Revenue 차이</b> — Units 기준 상위와 Revenue 기준 상위가 다름. QTY 탭으로 전환해 가성비 스타일 확인.'},
+  ],
+  'best-so': [
+    {col:'#E53935', text:'<b>AS001T 경고</b> — SO $241K이지만 customers=1 (Altard State 단독). 특정 고객 의존도 극단적으로 높음.'},
+    {col:'#1976D2', text:'<b>JT001 파이프라인 1위</b> — $422K, 309명 고객. Invoice 기준(8위)보다 SO에서 훨씬 강세. 이번 시즌 핵심 스타일.'},
+    {col:'#FB8C00', text:'<b>단독 고객 스타일 주의</b> — AS001T·DP790-26·DP433-26·MS006·MP005·MS007 등 6개가 customers=1. 해당 고객 이탈 시 전량 리스크.'},
+    {col:'#43A047', text:'<b>BP433J 범용성 1위</b> — 331개 고객, 393 orders. SO와 Invoice 모두 상위권인 유일한 스타일.'},
+  ],
+  'so-channel': [
+    {col:'#1976D2', text:'<b>In-House 독주</b> — $5.2M으로 전체 SO의 57%. 주로 대형 고객(Stitch Fix 등) 전용 스타일(MS, MP 시리즈).'},
+    {col:'#A78BFA', text:'<b>Showroom 특화 스타일</b> — AS001T·DP790-26 등 Altard State 전용 신상품이 Showroom 채널 장악.'},
+    {col:'#4ADE80', text:'<b>Web과 FashionGo는 동일 스타일</b> — BP433J·BP473J·JT001이 두 채널 모두 상위권. 온라인 채널 간 경쟁 존재.'},
+    {col:'#FB8C00', text:'<b>E-Mail Order 미미</b> — $17.7K, DP689·DP683 단 2개. 채널 활성화 여지 있음.'},
+  ],
+  'cust-style': [
+    {col:'#1976D2', text:'<b>Stitch Fix = 전용 스타일</b> — MS006·MP005·MS007 등 전부 타 고객에게 없는 전용 라인. 이탈 시 재고 처분 어려움.'},
+    {col:'#43A047', text:'<b>Altard State 빠른 성장</b> — SO $1.05M. DP790-26·DP433-26 등 신시즌 스타일 대량 주문. 2025년 신규 파트너.'},
+    {col:'#FB8C00', text:'<b>Bohme 맞춤 생산 주의</b> — DP697-BO·DP896-BO 등 "-BO" 전용 스타일 5개. 브랜드 관계 악화 시 재고 위험.'},
+    {col:'#9E9E9E', text:'<b>NATI는 범용 스타일 구매</b> — BP239J·BP473J·BP333J 등 타 고객도 많이 사는 스타일. 관계 리스크 낮음.'},
+  ],
+  'qtr-trend': [
+    {col:'#1976D2', text:'<b>2026-Q1 폭발적 성장</b> — JT001 $351K, BP433J $245K. Q4 25 대비 각각 +940%, +1,467% 급증. 시즌 오더 집중.'},
+    {col:'#43A047', text:'<b>DP783 Q3 피크</b> — 2025-Q3 $33K로 정점 후 급감. 여름 시즌 스타일. 재주문 시기 고려 필요.'},
+    {col:'#FB8C00', text:'<b>2025-Q1·Q2는 데이터 희박</b> — 대부분 스타일이 Q3부터 시작. SO 데이터가 최근 9개월치만 포함되어 있음.'},
+    {col:'#E53935', text:'<b>JT001·BP433J 쏠림</b> — Q1 26 합산 $596K로 전체의 50%+ 차지. 나머지 스타일 다변화 필요.'},
+  ],
+  'customers': [
+    {col:'#1976D2', text:'<b>Jan 2026 신규 최고</b> — 238명 신규 유입, 트레이드쇼 시즌 효과. 반면 2025-12 최저(53명).'},
+    {col:'#E53935', text:'<b>365d+ 비활성 2,463명</b> — 전체의 34.4%. 이 중 과거 구매 이력 있는 고객 대상 win-back 캠페인 필요.'},
+    {col:'#43A047', text:'<b>Mar 2026 Repeat 88.6%</b> — 신규보다 기존 고객 재구매가 압도적. 충성 고객 기반 탄탄.'},
+    {col:'#FB8C00', text:'<b>91-180d 구간 723명 위험</b> — 아직 lost는 아니지만 접촉 없으면 이탈 가능성 높음. 즉시 재활성화 타겟.'},
+  ],
+  'cust-rfm': [
+    {col:'#1976D2', text:'<b>Champions 12.8%가 매출 75.8%</b> — 917명이 $57.7M. 이 세그먼트 유지가 사업 생존과 직결. 특별 관리 필수.'},
+    {col:'#E53935', text:'<b>Lost 3,651명 매출 $5.7M</b> — 한 번은 샀지만 돌아오지 않음. 평균 LTV $1,570. Win-back ROI 충분.'},
+    {col:'#FB8C00', text:'<b>At Risk 933명 $5.1M 위험</b> — 자주 샀지만 180일+ 침묵. 할인 오퍼나 신상품 알림으로 즉시 재활성화 필요.'},
+    {col:'#43A047', text:'<b>New+Promising 793명 성장 가능성</b> — 최근 유입이지만 아직 구매 습관 미형성. 온보딩 프로그램으로 Loyal로 전환 목표.'},
+  ],
+  'cust-activity': [
+    {col:'#E53935', text:'<b>2025 Churn 59% 악화</b> — 2024(44.6%) 대비 14.4%p 상승. 4,430명 중 2,612명 이탈. 구조적 문제 가능성.'},
+    {col:'#FB8C00', text:'<b>POOL HOUSE NY 240일 침묵</b> — $562K 고객인데 2025-08 이후 구매 없음. At Risk 1순위. 즉각 접촉 필요.'},
+    {col:'#1976D2', text:'<b>Top 4 고객 모두 active</b> — Stitch Fix(2d), Altard State(2d), NATI(1d), Just Black Denim(2d). 핵심 매출 안정.'},
+    {col:'#43A047', text:'<b>Bobbles and Lace 72일</b> — $773K 고객이 1월 이후 구매 없음. Watch 단계 진입. 선제적 관계 관리 권고.'},
+  ],
+  'cust-value': [
+    {col:'#E53935', text:'<b>파레토보다 극단적</b> — Top 1%(72명)가 57.3%, Top 10%가 81.8%. 일반적 80/20 법칙보다 훨씬 집중.'},
+    {col:'#1976D2', text:'<b>50+ 주문 고객 230명이 핵심</b> — $47.6M(62.5%). 1인당 평균 LTV $206K. 이 그룹 이탈 = 사업 위기.'},
+    {col:'#FB8C00', text:'<b>1회 구매 고객 2,437명 방치 중</b> — 전체 34.1%인데 매출 기여는 1.5%($1.2M)에 불과. 2회 구매 유도가 핵심 KPI.'},
+    {col:'#43A047', text:'<b>AOV $500 미만 고객 4,682명</b> — 수는 많지만 매출은 12.9%. 소량 고객 육성보다 고AOV 고객 관리에 집중 권장.'},
+  ],
+  'inventory': [
+    {col:'#E53935', text:'<b>JT001 OTS -8,202 위험</b> — OH 3,237 있지만 오픈 오더가 훨씬 많음. 즉각 PO 발주 필요.'},
+    {col:'#FB8C00', text:'<b>AB404H OTS -4,209</b> — OH 3,091인데 음수 OTS. Stitch Fix 오더 집중 스타일로 공급 불이행 시 관계 악화.'},
+    {col:'#1976D2', text:'<b>CLOSE OUT 10,508 OH</b> — 단종 재고 최다 보유. 할인 판매 또는 처분 계획 수립 필요.'},
+    {col:'#43A047', text:'<b>ATS 양수 스타일 다수</b> — DP793(2,447), JH305(3,351) 등 ATS 여유 있는 스타일 적극 영업 가능.'},
+  ],
+  'reorder': [
+    {col:'#E53935', text:'<b>AS001T 커버리지 4%</b> — OH 6 units, 오픈 오더 15,227. 즉각 대량 발주 필요. Altard State 납기 지연 위험.'},
+    {col:'#E53935', text:'<b>AB692G·IP240P도 임계치 미달</b> — 각각 4%, 5% 커버. 세 스타일 합산 오픈 오더 23,227 units 위험 노출.'},
+    {col:'#FB8C00', text:'<b>BP433J-A 38% 커버</b> — 상대적으로 양호하지만 오더 증가 추세. 분기 1회 재고 점검 권장.'},
+    {col:'#9E9E9E', text:'<b>커버리지 = OH ÷ (OH + Open Orders)</b> — 10% 미만은 즉시 조치, 50% 미만은 모니터링 대상.'},
+  ],
+  'deadstock': [
+    {col:'#E53935', text:'<b>SF32H-3 232일 미판매</b> — 3,180 OH. 2025-08 이후 Invoice 없음. Short 카테고리 수요 감소 신호.'},
+    {col:'#FB8C00', text:'<b>8개 스타일 합산 13,017 OH</b> — 보관 비용 누적 중. 프라이빗 세일 또는 클리어런스 투입 검토 권장.'},
+    {col:'#1976D2', text:'<b>DP649 vs 재주문 주의</b> — OH 1,654 있는데 Reorder 리스트에도 없음. 단종 여부 확인 필요.'},
+    {col:'#43A047', text:'<b>Slow Movers 5개는 아직 기회</b> — 90-180일 경과, OH 합계 5,610. 할인 없이 추가 영업 가능한 시간 남아있음.'},
+  ],
+  'stockout': [
+    {col:'#E53935', text:'<b>BP258J $483K 매출인데 재고 0</b> — OH 0, ATS -36. 고매출 스타일 품절은 직접 매출 손실.'},
+    {col:'#E53935', text:'<b>AB231H OH 695있지만 OTS -6,705</b> — 이미 오버셀링. 현재 OH는 일부만 커버 가능. 고객 알림 필요.'},
+    {col:'#FB8C00', text:'<b>Revenue at risk $2.5M</b> — 10개 스타일 합산. 적시 입고 또는 대체 스타일 제안으로 일부 회수 가능.'},
+    {col:'#1976D2', text:'<b>IP240P Low Cover 5%</b> — OH 3 vs 오픈 오더 5,500. PO #105789 이번 주 입고 예정. 입고 후 즉시 배정 필요.'},
+  ],
+  'oversold': [
+    {col:'#E53935', text:'<b>AS001T -15,221 units 최대 초과</b> — Altard State 전용. OH 6 units로 사실상 전량 미이행. PO 발주 긴급.'},
+    {col:'#E53935', text:'<b>신시즌 스타일 집중</b> — DP790-26·MS006·DP433-26·MS007 등 2026 신상품이 오버셀링. 예측 발주 부족.'},
+    {col:'#FB8C00', text:'<b>JT001 OH 3,273 있어도 OTS -8,142</b> — 부분 이행 가능하지만 백오더 5,523 units 처리 필요.'},
+    {col:'#43A047', text:'<b>BP433J는 OH로 흡수 가능</b> — OH 3,049, ATS +3,119 양수. 오버셀링이지만 실제 이행에는 문제 없음.'},
+  ],
+  'orders': [
+    {col:'#E53935', text:'<b>AS001T 15,227 units 백오더</b> — $242K. 재고 6 units. 입고 전까지 이행 불가. 고객(Altard State) 커뮤니케이션 필요.'},
+    {col:'#FB8C00', text:'<b>JT001·BP433J 상위 집중</b> — 백오더 Top 2가 $436K. 전체 $10.9M의 4%. 스타일 분산은 잘 되어 있음.'},
+    {col:'#1976D2', text:'<b>SP26 STR 24.6% 최고</b> — 현재 시즌 소진율 가장 빠름. 재주문 시점 검토 가능.'},
+    {col:'#9E9E9E', text:'<b>MS006·MP005·MS007 합산 $449K</b> — 전부 Stitch Fix 전용. 입고 지연 시 단일 고객 이슈로 연결.'},
+  ],
+  'ts-detail': [
+    {col:'#1976D2', text:'<b>선택한 쇼의 성장 추이를 확인하세요</b> — vs Prior % 컬럼에서 전 회차 대비 성장/하락 파악.'},
+    {col:'#43A047', text:'<b>Dallas 2026 강세</b> — Jan $603K, Mar $333K. 2025 Jan $367K 대비 Jan만 +64% 성장.'},
+    {col:'#FB8C00', text:'<b>Magic LV 2026-02 $1.64M 역대 최고</b> — 전 회차(2025-08 $95K) 대비 +1,627%. 시즌 오더 집중 패턴.'},
+    {col:'#9E9E9E', text:'<b>SO 기준 = 현재 파이프라인</b> — 실제 Invoice와 다를 수 있음. 특히 최근 회차는 아직 처리 중인 오더 포함.'},
+  ],
+  'ts-compare': [
+    {col:'#FB8C00', text:'<b>Magic LV 압도적 1위</b> — $3.8M, 전체 TS의 31%. 2026-02 한 번 쇼에서 $1.64M. 반년마다 열리는 최대 쇼.'},
+    {col:'#1976D2', text:'<b>Atlanta 2위</b> — $2.97M, 연 4-6회로 가장 빈번. 안정적인 매출 기반. 2026-02 $509K로 최고 기록.'},
+    {col:'#43A047', text:'<b>Surf 성장 주목</b> — 2024-01 $42K → 2026-01 $159K. 3배 성장. 소규모지만 빠른 확장.'},
+    {col:'#9E9E9E', text:'<b>Hawaii·Flaire·CALA는 신규</b> — 2025 하반기 시작. 아직 데이터 1-2회차. 추세 판단은 내년 이후 가능.'},
+  ],
+  'calendar': [
+    {col:'#E53935', text:'<b>682개 PO 연체</b> — Jan 02부터 연체 시작. D-F739M1-MX·I-FS60647W-3 각 50,000 units, 89일 초과.'},
+    {col:'#FB8C00', text:'<b>이번 주 74,182 units 입고 예정</b> — BP433J·BP473J·IP240P 등 포함. Oversold 스타일 입고 후 즉시 배정 필요.'},
+    {col:'#1976D2', text:'<b>4월 총 306,459 units</b> — 가장 바쁜 입고 달. 창고 용량 및 처리 인력 사전 확보 권장.'},
+    {col:'#43A047', text:'<b>5월 이후 입고량 급감</b> — May 226K → Jun 103K → Jul 70K. 여름 비수기 후 FA26 시즌 PO 발주 시점 도래.'},
+  ],
+  'polist': [
+    {col:'#E53935', text:'<b>PO 800358·800360 각 50K units 89일 연체</b> — 원단/부자재 추정. 즉각 공급업체 확인 필요.'},
+    {col:'#FB8C00', text:'<b>PO 30354 BP433J 86일 연체</b> — 현재 Best Seller 2위 스타일. 입고 지연이 백오더에 직접 영향.'},
+    {col:'#1976D2', text:'<b>이번 주 PO 4개 입고 예정</b> — Apr 01-07 사이 74,182 units. 연체분 포함 즉시 처리 스케줄링 필요.'},
+    {col:'#9E9E9E', text:'<b>682개 연체 중 Jan 이전이 3개</b> — 나머지는 최근 연체. 공급업체별 패턴 분석으로 만성 지연 업체 파악 권장.'},
+  ],
+  'ar': [
+    {col:'#E53935', text:'<b>Stitch Fix $9.78M 독보적 1위</b> — 전체 AR의 50.9%. 이 고객의 지급 패턴이 현금흐름 전체를 좌우.'},
+    {col:'#E53935', text:'<b>90일+ 연체가 72.5%</b> — $13.9M. 평균 141.8일은 Net 30-60 기준 대비 2-3배 초과. 구조적 AR 관리 문제.'},
+    {col:'#FB8C00', text:'<b>Altard State $710K, Nuuly $590K</b> — 빠르게 성장 중인 고객들의 AR도 증가. 신용 한도 재검토 필요.'},
+    {col:'#1976D2', text:'<b>Current(0-30d) $1.8M만 정상</b> — 전체의 9.4%만 정상 구간. 61-90d $1.88M도 곧 90일+ 진입 예정.'},
+  ],
+  'reps': [
+    {col:'#1976D2', text:'<b>In-House 독주 $31.5M</b> — 전체의 87.5%. 외부 렙 비중 극히 낮음. 영업 채널 다각화 여지 있음.'},
+    {col:'#43A047', text:'<b>In-House Mar 2026 $881K 역대 최고</b> — 6개월 중 최고 기록. 트레이드쇼 시즌 효과.'},
+    {col:'#FB8C00', text:'<b>Faire 합산 $7.4M</b> — Faire 0($3.5M) + Faire 10($3.2M) + Faire 15($0.8M). 커미션 구조 검토 필요.'},
+    {col:'#9E9E9E', text:'<b>Lauren T.·Gustavo B. 각 $240K+</b> — 개인 렙 중 상위권. 성과 기반 인센티브 구조 검토 권장.'},
+  ],
+  'custltv': [
+    {col:'#1976D2', text:'<b>Stitch Fix $20.6M, 4,146 orders</b> — 2위(Altard State $2.4M)와 $18M 격차. 단일 고객 의존도가 비정상적으로 높음.'},
+    {col:'#43A047', text:'<b>NATI 281 orders로 관계 탄탄</b> — $1.57M, 주문 빈도 상위권. 충성도 높은 Mid-tier 고객.'},
+    {col:'#FB8C00', text:'<b>SCHEELS 326 orders $317K</b> — 주문 빈도는 상위권이지만 LTV는 낮음. 소량 반복 고객. AOV $972.'},
+    {col:'#E53935', text:'<b>Stitch Fix 이탈 시뮬레이션</b> — 해당 고객 제외 시 총 매출 $158M → $137M (-13.0%). 리스크 헤지 전략 필요.'},
+  ],
+  'str': [
+    {col:'#43A047', text:'<b>SP26 STR 24.6% 최고</b> — 현재 시즌 중 가장 빠른 소진. 추가 발주 또는 조기 마감 검토 시점.'},
+    {col:'#FB8C00', text:'<b>FA25 17.2% 중간 수준</b> — 아직 시즌 진행 중. 재고 관리 집중 필요. 작년 FA24(15.4%)보다 약간 개선.'},
+    {col:'#E53935', text:'<b>FA23 3.0% 위험</b> — 2년 이상 된 재고 거의 소진 안 됨. 클리어런스 또는 번들 판매 검토 필요.'},
+    {col:'#1976D2', text:'<b>오픈 오더 SP26 9,257 units 최다</b> — 현재 시즌 백오더도 가장 많음. 입고 타이밍이 STR에 직접 영향.'},
+  ],
+};
+
+const INSIGHTS_EN = {
+  'overview': [
+    {col:'#1976D2', text:'<b>Extreme revenue concentration</b> — Top 10% of customers account for 81.8% of revenue. Stitch Fix alone: $20.6M (27%).'},
+    {col:'#43A047', text:'<b>March 2026 strong recovery</b> — $1.68M, +31.4% MoM. Up 192% from Dec 2025 low of $576K.'},
+    {col:'#E53935', text:'<b>AR risk</b> — 72.5% ($13.9M) of open AR $19.2M is 90d+ overdue. Avg collection day 141.8d.'},
+    {col:'#E53935', text:'<b>682 POs overdue</b> — 1,076,210 units delayed. Max 89 days late. Directly impacting backlog fulfillment.'},
+  ],
+  'best': [
+    {col:'#1976D2', text:'<b>BP353J dominant #1</b> — $4.26M, 123,941 units. $340K gap to #2 BP433J ($3.92M). PANTS = 80% of revenue.'},
+    {col:'#43A047', text:'<b>Top 5 only 11% of total</b> — $17M of $158M. Revenue relatively well distributed across 2,091 styles.'},
+    {col:'#FB8C00', text:'<b>SHORT PANTS standout</b> — SF32H-3 60,992 units, JT001 56,146 units. SKIRTS (CD123K 61K) also top by qty.'},
+    {col:'#9E9E9E', text:'<b>QTY vs Revenue differ</b> — Switch to QTY tab to see value-per-unit styles ranked differently.'},
+  ],
+  'best-so': [
+    {col:'#E53935', text:'<b>AS001T warning</b> — SO $241K but customers=1 (Altard State only). Extreme single-customer dependency.'},
+    {col:'#1976D2', text:'<b>JT001 pipeline #1</b> — $422K, 309 customers. Much stronger in SO vs Invoice (#8). Key style this season.'},
+    {col:'#FB8C00', text:'<b>6 styles with 1 customer</b> — AS001T, DP790-26, DP433-26, MS006, MP005, MS007. Loss of that customer = full risk.'},
+    {col:'#43A047', text:'<b>BP433J most universal</b> — 331 customers, 393 orders. Only style ranking high in both SO and Invoice.'},
+  ],
+  'so-channel': [
+    {col:'#1976D2', text:'<b>In-House dominates</b> — $5.2M, 57% of SO. Mostly large-account exclusive styles (MS, MP series).'},
+    {col:'#A78BFA', text:'<b>Showroom exclusive styles</b> — AS001T, DP790-26 (Altard State exclusives) dominate Showroom channel.'},
+    {col:'#4ADE80', text:'<b>Web & FashionGo overlap</b> — BP433J, BP473J, JT001 rank top in both. Online channel competition.'},
+    {col:'#FB8C00', text:'<b>E-Mail Order minimal</b> — Only $17.7K, 2 styles. Opportunity to activate this channel.'},
+  ],
+  'cust-style': [
+    {col:'#1976D2', text:'<b>Stitch Fix = exclusive styles</b> — MS006, MP005, MS007 are unique to them. Hard to liquidate if they churn.'},
+    {col:'#43A047', text:'<b>Altard State fast growing</b> — SO $1.05M. DP790-26, DP433-26 large new season orders. New partner since 2025.'},
+    {col:'#FB8C00', text:'<b>Bohme custom styles risk</b> — DP697-BO, DP896-BO etc. "-BO" exclusives. Inventory risk if relationship ends.'},
+    {col:'#9E9E9E', text:'<b>NATI buys standard styles</b> — BP239J, BP473J, BP333J bought by many other customers too. Low relationship risk.'},
+  ],
+  'qtr-trend': [
+    {col:'#1976D2', text:'<b>2026-Q1 explosive growth</b> — JT001 $351K, BP433J $245K. vs Q4 25: +940%, +1,467% spike. Seasonal order concentration.'},
+    {col:'#43A047', text:'<b>DP783 Q3 peak</b> — 2025-Q3 $33K peak then drops sharply. Summer season style. Plan reorder timing accordingly.'},
+    {col:'#FB8C00', text:'<b>2025-Q1/Q2 sparse data</b> — Most styles start Q3. SO data covers recent ~9 months only.'},
+    {col:'#E53935', text:'<b>JT001+BP433J concentration</b> — $596K combined in Q1 26, 50%+ of total. Need to diversify style pipeline.'},
+  ],
+  'customers': [
+    {col:'#1976D2', text:'<b>Jan 2026 new customer peak</b> — 238 new customers, trade show season effect. Dec 2025 was lowest at 53.'},
+    {col:'#E53935', text:'<b>2,463 customers inactive 365d+</b> — 34.4% of total. Win-back campaign opportunity for past purchasers.'},
+    {col:'#43A047', text:'<b>Mar 2026 repeat rate 88.6%</b> — Overwhelmingly repeat-driven. Strong loyal customer base.'},
+    {col:'#FB8C00', text:'<b>723 customers in 91-180d zone</b> — Not lost yet but at risk without outreach. Immediate reactivation target.'},
+  ],
+  'cust-rfm': [
+    {col:'#1976D2', text:'<b>Champions 12.8% = 75.8% revenue</b> — 917 customers drive $57.7M. Their retention is existential for the business.'},
+    {col:'#E53935', text:'<b>3,651 Lost customers, $5.7M</b> — Avg LTV $1,570. Win-back ROI is compelling if even 10% can be recovered.'},
+    {col:'#FB8C00', text:'<b>933 At Risk = $5.1M danger</b> — Frequent buyers gone silent 180d+. Discount offer or new arrival alert needed now.'},
+    {col:'#43A047', text:'<b>793 New+Promising = growth pool</b> — Recent acquisition but habit not formed. Onboarding program → Loyal tier target.'},
+  ],
+  'cust-activity': [
+    {col:'#E53935', text:'<b>2025 churn worsening at 59%</b> — Up 14.4pp from 2024 (44.6%). 2,612 of 4,430 customers lost. Structural issue.'},
+    {col:'#FB8C00', text:'<b>POOL HOUSE NY silent 240 days</b> — $562K customer, no purchase since Aug 2025. #1 at-risk account. Contact now.'},
+    {col:'#1976D2', text:'<b>Top 4 customers all active</b> — Stitch Fix (2d), Altard State (2d), NATI (1d), Just Black Denim (2d). Core revenue stable.'},
+    {col:'#43A047', text:'<b>Bobbles and Lace 72 days</b> — $773K customer, no purchase since January. Watch stage. Proactive relationship management.'},
+  ],
+  'cust-value': [
+    {col:'#E53935', text:'<b>More extreme than Pareto</b> — Top 1% (72 customers) = 57.3%, Top 10% = 81.8%. Far beyond typical 80/20 rule.'},
+    {col:'#1976D2', text:'<b>230 customers with 50+ orders = core</b> — $47.6M (62.5%). Avg LTV $206K each. This group\'s churn = business crisis.'},
+    {col:'#FB8C00', text:'<b>2,437 one-time buyers untapped</b> — 34.1% of customers, only 1.5% of revenue. Converting to 2nd purchase is key KPI.'},
+    {col:'#43A047', text:'<b>AOV <$500 = 4,682 customers</b> — Large count but only 12.9% of revenue. Focus on high-AOV customer development.'},
+  ],
+  'inventory': [
+    {col:'#E53935', text:'<b>JT001 OTS -8,202 critical</b> — OH 3,237 but open orders far exceed. Urgent PO needed immediately.'},
+    {col:'#FB8C00', text:'<b>AB404H OTS -4,209</b> — OH 3,091 but negative OTS. Stitch Fix order concentration. Non-fulfillment risks relationship.'},
+    {col:'#1976D2', text:'<b>CLOSE OUT 10,508 OH</b> — Largest single stock item. Need markdown sale or disposal plan.'},
+    {col:'#43A047', text:'<b>Several styles with positive ATS</b> — DP793 (2,447), JH305 (3,351) have ATS headroom. Active selling opportunity.'},
+  ],
+  'reorder': [
+    {col:'#E53935', text:'<b>AS001T 4% coverage</b> — OH 6 units vs 15,227 open orders. Mass reorder needed now. Altard State delivery at risk.'},
+    {col:'#E53935', text:'<b>AB692G + IP240P also critical</b> — 4% and 5% coverage. Combined open orders 23,227 units at risk.'},
+    {col:'#FB8C00', text:'<b>BP433J-A at 38%</b> — Relatively better but trending up. Quarterly inventory review recommended.'},
+    {col:'#9E9E9E', text:'<b>Coverage = OH ÷ (OH + Open Orders)</b> — Under 10%: immediate action. Under 50%: monitor closely.'},
+  ],
+  'deadstock': [
+    {col:'#E53935', text:'<b>SF32H-3 idle 232 days</b> — 3,180 OH. No invoice since Aug 2025. Declining demand signal for Short category.'},
+    {col:'#FB8C00', text:'<b>8 styles = 13,017 OH stagnant</b> — Storage costs accumulating. Private sale or clearance recommended.'},
+    {col:'#1976D2', text:'<b>DP649 not in reorder list</b> — 1,654 OH with no active demand. Confirm discontinuation or find new buyers.'},
+    {col:'#43A047', text:'<b>Slow movers still have time</b> — 5 styles, 90-180d elapsed, 5,610 OH combined. Can still sell without markdown.'},
+  ],
+  'stockout': [
+    {col:'#E53935', text:'<b>BP258J $483K revenue, zero stock</b> — OH 0, ATS -36. High-revenue stockout = direct sales loss.'},
+    {col:'#E53935', text:'<b>AB231H OH 695 but OTS -6,705</b> — Already overselling. Current stock covers only a fraction. Customer notification needed.'},
+    {col:'#FB8C00', text:'<b>$2.5M revenue at risk</b> — 10 styles combined. Timely receiving or alternative style offers can recover some.'},
+    {col:'#1976D2', text:'<b>IP240P 5% coverage</b> — OH 3 vs 5,500 open orders. PO #105789 arriving this week. Assign immediately on receipt.'},
+  ],
+  'oversold': [
+    {col:'#E53935', text:'<b>AS001T -15,221 units worst</b> — Altard State exclusive. OH only 6 units — essentially unfulfillable. Emergency PO needed.'},
+    {col:'#E53935', text:'<b>New season styles oversold</b> — DP790-26, MS006, DP433-26, MS007: all 2026 new arrivals. Forecast ordering was insufficient.'},
+    {col:'#FB8C00', text:'<b>JT001 partial coverage possible</b> — OH 3,273, ATS +5,523. Backorder of 5,523 units needs processing.'},
+    {col:'#43A047', text:'<b>BP433J can absorb oversell</b> — OH 3,049, ATS +3,119 positive. Oversold on paper but actual fulfillment is fine.'},
+  ],
+  'orders': [
+    {col:'#E53935', text:'<b>AS001T 15,227 units backlog</b> — $242K. Only 6 units in stock. Cannot fulfill until PO arrives. Communicate with Altard State.'},
+    {col:'#FB8C00', text:'<b>JT001+BP433J top 2 backlog</b> — $436K combined. Only 4% of $10.9M total. Style diversification is healthy.'},
+    {col:'#1976D2', text:'<b>SP26 STR 24.6% best</b> — Fastest sell-through of current seasons. Reorder timing review possible.'},
+    {col:'#9E9E9E', text:'<b>MS006+MP005+MS007 = $449K</b> — All Stitch Fix exclusive. Receiving delay becomes single-customer issue.'},
+  ],
+  'ts-detail': [
+    {col:'#1976D2', text:'<b>Check growth trend for selected show</b> — Use "vs Prior" column to spot acceleration or decline across show dates.'},
+    {col:'#43A047', text:'<b>Dallas 2026 strong</b> — Jan $603K, Mar $333K. Jan alone up +64% vs Jan 2025 ($367K).'},
+    {col:'#FB8C00', text:'<b>Magic LV Feb 2026 = all-time record</b> — $1.64M vs prior show $95K (+1,627%). Seasonal order spike pattern.'},
+    {col:'#9E9E9E', text:'<b>SO basis = current pipeline</b> — May differ from actual invoiced amounts. Recent dates may have open SO still processing.'},
+  ],
+  'ts-compare': [
+    {col:'#FB8C00', text:'<b>Magic LV #1 by far</b> — $3.8M, 31% of all TS revenue. Single show (Feb 2026) generated $1.64M alone.'},
+    {col:'#1976D2', text:'<b>Atlanta #2</b> — $2.97M, 4-6x per year most frequent. Consistent revenue base. Feb 2026 record at $509K.'},
+    {col:'#43A047', text:'<b>Surf fastest growing</b> — Jan 2024 $42K → Jan 2026 $159K. 3x growth. Small but expanding rapidly.'},
+    {col:'#9E9E9E', text:'<b>Hawaii, Flaire, CALA are new</b> — Started H2 2025. Only 1-2 data points. Trend assessment possible after 2026.'},
+  ],
+  'calendar': [
+    {col:'#E53935', text:'<b>682 POs overdue</b> — Delinquency started Jan 02. D-F739M1-MX and I-FS60647W-3: 50,000 units each, 89 days late.'},
+    {col:'#FB8C00', text:'<b>74,182 units arriving this week</b> — Includes BP433J, BP473J, IP240P. Assign to oversold styles immediately on arrival.'},
+    {col:'#1976D2', text:'<b>April = 306,459 units busiest month</b> — Plan warehouse capacity and processing staff in advance.'},
+    {col:'#43A047', text:'<b>Inbound drops sharply after May</b> — May 226K → Jun 103K → Jul 70K. FA26 season PO placement timing approaching.'},
+  ],
+  'polist': [
+    {col:'#E53935', text:'<b>PO 800358+800360: 50K units each, 89d late</b> — Raw material/trims suspected. Contact supplier immediately.'},
+    {col:'#FB8C00', text:'<b>PO 30354 BP433J 86 days late</b> — Current #2 best seller. Delay directly impacts open backlog fulfillment.'},
+    {col:'#1976D2', text:'<b>4 POs arriving this week</b> — Apr 01-07, 74,182 units. Include overdue items. Schedule processing immediately.'},
+    {col:'#9E9E9E', text:'<b>3 of 682 overdue predate Jan</b> — Remaining are recent. Analyze by supplier to identify chronic delinquents.'},
+  ],
+  'ar': [
+    {col:'#E53935', text:'<b>Stitch Fix $9.78M = 50.9% of AR</b> — This single customer\'s payment pattern controls entire company cash flow.'},
+    {col:'#E53935', text:'<b>72.5% of AR is 90d+ overdue</b> — $13.9M. Avg collection 141.8d is 2-3x standard Net 30-60 terms.'},
+    {col:'#FB8C00', text:'<b>Altard State $710K, Nuuly $590K growing</b> — Fast-growing accounts also growing AR. Credit limit review needed.'},
+    {col:'#1976D2', text:'<b>Only $1.8M (9.4%) in current bucket</b> — 61-90d bucket ($1.88M) will soon roll into 90d+ as well.'},
+  ],
+  'reps': [
+    {col:'#1976D2', text:'<b>In-House dominates at $31.5M</b> — 87.5% of total. External rep contribution minimal. Channel diversification opportunity.'},
+    {col:'#43A047', text:'<b>In-House Mar 2026 $881K all-time high</b> — Best month in tracked 6 months. Trade show season boost.'},
+    {col:'#FB8C00', text:'<b>Faire combined $7.4M</b> — Faire 0 ($3.5M) + Faire 10 ($3.2M) + Faire 15 ($0.8M). Review commission structure.'},
+    {col:'#9E9E9E', text:'<b>Lauren T. and Gustavo B. top individual reps</b> — $240K+ each. Performance-based incentive review recommended.'},
+  ],
+  'custltv': [
+    {col:'#1976D2', text:'<b>Stitch Fix $20.6M, 4,146 orders</b> — $18M gap to #2 (Altard State $2.4M). Dangerously concentrated single-customer dependency.'},
+    {col:'#43A047', text:'<b>NATI 281 orders — strong loyalty</b> — $1.57M, high order frequency. Reliable mid-tier customer.'},
+    {col:'#FB8C00', text:'<b>SCHEELS 326 orders, only $317K</b> — High frequency but low LTV. Avg order $972. Small quantity repeat buyer.'},
+    {col:'#E53935', text:'<b>Stitch Fix churn simulation</b> — Remove them: $158M → $137M (-13.0%). Risk hedge strategy urgently needed.'},
+  ],
+  'str': [
+    {col:'#43A047', text:'<b>SP26 STR 24.6% best current</b> — Fastest sell-through of active seasons. Consider additional orders or early close.'},
+    {col:'#FB8C00', text:'<b>FA25 17.2% mid-range</b> — Season still ongoing. Inventory management focus needed. Slight improvement from FA24 (15.4%).'},
+    {col:'#E53935', text:'<b>FA23 3.0% danger zone</b> — 2+ year old inventory barely moving. Clearance or bundle sale needed.'},
+    {col:'#1976D2', text:'<b>SP26 open orders 9,257 units highest</b> — Most backorder of current seasons. Inbound timing directly impacts STR.'},
+  ],
+};
+const INSIGHTS = INSIGHTS_EN;
+  const items=(curLang==='ko'?INSIGHTS_KO:INSIGHTS)[pg];
+  const el=document.getElementById('pg-'+pg);
+  if(!el||!items) return;
+  const existing=el.querySelector('.insight-bar');
+  if(existing) existing.remove();
+  const bar=document.createElement('div');
+  bar.className='insight-bar';
+  bar.innerHTML=`<div class="insight-bar-title">${t('key_insights')}</div><div class="insight-rows">${
+    items.map(i=>`<div class="insight-item"><div class="insight-dot" style="background:${i.col}"></div><div>${i.text}</div></div>`).join('')
+  }</div>`;
+  el.appendChild(bar);
+}
 
 // ── CALENDAR ─────────────────────────────────────────────
 let calY=2026,calM=3;
@@ -717,7 +2156,7 @@ function prevMo(){calM--;if(calM<0){calM=11;calY--;}renderCal();}
 function nextMo(){calM++;if(calM>11){calM=0;calY++;}renderCal();}
 
 // ── AI QUERY ─────────────────────────────────────────────
-const AI_CTX='You are an analyst for Just Panmaco Inc, an apparel wholesaler. Data: Revenue $158M total. Mar2026 $1.68M +31.4%. Best styles: BP353J $4.26M 124K, BP433J $3.92M 107K. PANTS 80% of revenue. Customers 6159 total 66.3% repeat. Stitch Fix $9.88M top. AR open $19.2M avg 141.8d 90+d $13.9M(72.5%). Reps: In House $31.5M, Faire0 $3.49M, Faire10 $3.16M. PO: 682 overdue 1076210 units, this week 78/74182. Inventory 237452 OH. JT001 OTS -8202. Answer Korean+English mixed, specific numbers.';
+const AI_CTX='You are an analyst for Just Panmaco Inc, an apparel wholesaler. Answer in Korean/English mixed with specific numbers.\n\nREVENUE: $158M total. Mar2026 $1.68M +31.4% MoM.\nTOP STYLES (revenue, units): BP353J $4.26M 124K | BP433J $3.92M 107K | BP370J $2.61M 73K | BP339J $2.50M 69K | BP333J $2.33M 66K | BP304J $2.06M 61K | BP473J $1.88M 49K | BP239J $1.56M 46K | JT001 $1.10M 56K | AB404H $903K 33K.\nCATEGORIES: PANTS $126M(80%), SHORT PANTS $18M(12%), SKIRTS $4.1M, JACKET $2.6M.\n\nSTYLE x TOP CUSTOMERS:\nBP353J: STITCH FIX-HQ $119K | JUST BLACK DENIM $58K | STITCH AND FEATHER $43K\nBP433J: NATI $277K | SHOP AVARA $247K | NATI NEW YORK $100K\nBP370J: SHOES N MORE $69K | BOBBLES AND LACE $49K | JUST BLACK DENIM $31K\nBP339J: STITCH FIX-HQ $120K | SLOAN BOUTIQUE $45K | NATI $42K\nBP333J: NATI $209K | NATI NEW YORK $73K | JUST BLACK DENIM $36K\nBP304J: LULUS-COM $143K | JUST BLACK DENIM $20K | TREATY GENERAL $12K\nBP473J: NATI $200K | WILD OAK BOUTIQUE $89K | NATI NEW YORK $82K\nBP239J: NATI $246K | NATI NEW YORK $83K | JUST BLACK DENIM $25K\nJT001: ALTARD STATE $119K | VESTIQUE-WAREHOUSE $111K | GREY BANIT $82K\n\nCUSTOMERS: 6,159 total, 66.3% repeat. Top LTV: STITCH FIX $9.88M 2198 orders | NATI $1.57M | ALTARD STATE $978K.\nAR: Open $19.2M avg 141.8d. 90+d $13.9M(72.5%). Top: STITCH FIX $9.78M | ALTARD STATE $710K | NUULY $590K.\nREPS: In House $31.5M 21937inv | Faire0 $3.49M | Faire10 $3.16M.\nPO: 682 overdue/1,076,210 units. This week 78/74,182. Month 124/306,459.\nINVENTORY: 237,452 OH. Oversold: JT001 OTS -8202 | AB404H -4209 | BP433J -2031. Reorder: AS001T(6 OH vs 15,227 open).\nSEASON STR: SP26 24.6% | FA25 17.2% | SP25 13.5%.';
 
 function qa(q){document.getElementById('ai-q').value=q;runAI();}
 async function runAI(){
