@@ -270,7 +270,7 @@ tr:hover td{background:#F5F7FA}
   <!-- OVERVIEW -->
   <div class="page active" id="pg-overview">
     <div class="krow">
-      <div class="kcard kg"><div class="klabel">Revenue (Mar 2026)</div><div class="kval" id="ov-rev">$0</div><div class="ksub up" id="ov-rev-sub">↑ +-100.0% vs Feb</div></div>
+      <div class="kcard kg"><div class="klabel" id="ov-rev-lbl">Revenue</div><div class="kval" id="ov-rev">$0</div><div class="ksub up" id="ov-rev-sub">↑ +-100.0% vs Feb</div></div>
       <div class="kcard"><div class="klabel" id="ov-inv-lbl">Invoices</div><div class="kval" id="ov-inv">3,677</div><div class="ksub" id="ov-inv-sub" style="color:#9E9E9E">1,704 customers</div></div>
       <div class="kcard ka"><div class="klabel">Open Backlog</div><div class="kval">$10.8M</div><div class="ksub wn">499,932 units · </div></div>
       <div class="kcard kr"><div class="klabel">Open AR</div><div class="kval">$20.8M</div><div class="ksub dn">90+d: $15.1M (72.6%)</div></div>
@@ -315,7 +315,7 @@ tr:hover td{background:#F5F7FA}
         <div style="flex:1;overflow-y:auto;min-height:0">
           <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
             <thead style="position:sticky;top:0;background:#fff;z-index:1">
-              <tr><th style="width:4%">#</th><th style="width:13%">Style</th><th style="width:42%">Description</th><th style="width:9%">Cat</th><th class="tr" style="width:16%">Revenue</th><th class="tr" style="width:16%">Units</th></tr>
+              <tr><th style="width:4%">#</th><th style="width:13%">Style</th><th style="width:18%">Cat</th><th class="tr" style="width:13%">Revenue</th><th class="tr" style="width:9%">Units</th><th class="tr" style="width:13%">Invoices</th><th class="tr" style="width:13%">Customers</th><th class="tr" style="width:17%">Avg/Order</th></tr>
             </thead>
             <tbody id="tb-best"></tbody>
           </table>
@@ -334,7 +334,7 @@ tr:hover td{background:#F5F7FA}
     </div>
     <div class="row-fill" style="grid-template-columns:1fr">
       <div class="card"><div class="card-hd" id="worst-hd">Worst Sellers — Bottom 13 Styles</div>
-        <div class="tbl-wrap"><table><thead><tr><th style="width:18%">Style</th><th style="width:54%">Description</th><th class="tr" style="width:15%">Revenue</th><th class="tr" style="width:13%">Units</th></tr></thead><tbody id="tb-worst"></tbody></table></div>
+        <div class="tbl-wrap"><table><thead><tr><th style="width:15%">Style</th><th style="width:40%">Description</th><th style="width:18%">Last Invoice</th><th class="tr" style="width:13%">Revenue</th><th class="tr" style="width:14%">Units</th></tr></thead><tbody id="tb-worst"></tbody></table></div>
       </div>
     </div>
   </div>
@@ -1330,14 +1330,15 @@ const URGENT=[{po:800358,eta:'Jan 02',s:'D-F739M1-MX',u:50000,d:-89},{po:800360,
 const BEST20_QTY=[{s:'BP353J',d:'HR Utility Wide Leg',c:'PANTS',r:4255761,q:123941},{s:'BP433J',d:'Patch Pocket Wide Leg',c:'PANTS',r:3920424,q:106619},{s:'BP370J',d:'HR Tonal Crop Flare',c:'PANTS',r:2610959,q:72814},{s:'BP339J',d:'HR Cargo Pocket',c:'PANTS',r:2501530,q:68910},{s:'BP333J',d:'HR Scissor Cut Flare',c:'PANTS',r:2328301,q:65917},{s:'AB237',d:'Slim Wide Leg Jean',c:'PANTS',r:1176349,q:61713},{s:'CD123K',d:'A Line Frayed Skirt',c:'SKIRTS',r:1014847,q:61234},{s:'BP304J',d:'HR Vintage Straight',c:'PANTS',r:2063508,q:61062},{s:'SF32H-3',d:'Short With Cuff',c:'SHORT PANTS',r:1109873,q:60992},{s:'JT001',d:'Denim Skort',c:'SHORT PANTS',r:1097007,q:56146},{s:'BP370J-A',d:'HR Tonal Crop Flare A',c:'PANTS',r:1888313,q:51889},{s:'BP473J',d:'Barrel Jean With Seams',c:'PANTS',r:1881189,q:48625},{s:'JP862',d:'HR Wide Leg',c:'PANTS',r:814506,q:47205},{s:'BP239J',d:'HR Wide Leg',c:'PANTS',r:1560938,q:46328},{s:'DP683',d:'Slim Wide Leg',c:'PANTS',r:1186817,q:45734},{s:'DP649',d:'Utility Pant',c:'PANTS',r:1095247,q:43197},{s:'AB996',d:'Slim Wide Leg',c:'PANTS',r:764664,q:40921},{s:'AB721',d:'Wide Leg Jean',c:'PANTS',r:710674,q:40396},{s:'AB825',d:'Relaxed Wide Leg',c:'PANTS',r:669075,q:38250},{s:'BP460J',d:'Scissor Cut Wide Leg',c:'PANTS',r:1413966,q:37314}];
 
 let bestChart=null;
+const CAT_TAG={'PANTS':'tb','SHORT PANTS':'tg','JACKET':'ta','SKIRTS':'tgr','DRESS':'tgr','TOP':'tgr'};
 function updateBestSellers(){
   const sort=document.getElementById('best-sort').value;
   const pd=PD_BEST[curPeriod]||PD_BEST['all'];
   const data=sort==='qty'?[...pd.qty]:([...pd.rev]);
   const isQty=sort==='qty';
   const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
-  document.getElementById('best-chart-hd').textContent=isQty?`Top 20 Best Selling Styles — Units (${pdLabel})`:`Top 20 Best Selling Styles — Revenue (${pdLabel})`;
-  document.getElementById('best-tbl-hd').textContent=isQty?`Top 20 Detail — by Units · ${pdLabel}`:`Top 20 Detail — by Revenue · ${pdLabel}`;
+  document.getElementById('best-chart-hd').textContent=isQty?'Top 20 Best Selling Styles — Units ('+pdLabel+')':'Top 20 Best Selling Styles — Revenue ('+pdLabel+')';
+  document.getElementById('best-tbl-hd').textContent=isQty?'Top 20 Detail — by Units · '+pdLabel:'Top 20 Detail — by Revenue · '+pdLabel;
 
   // Redraw chart
   if(bestChart) bestChart.destroy();
@@ -1356,14 +1357,28 @@ function updateBestSellers(){
               x:{grid:{display:false},ticks:{font:{size:8},maxRotation:90,minRotation:45,autoSkip:false}}}}
   });
 
-  // Rebuild table
+  // Rebuild table — new columns: Cat, Revenue, Units, Invoices, Customers, Avg/Order
   const tbody = document.getElementById('tb-best');
   tbody.innerHTML='';
   data.forEach((r,i)=>{
-    const primaryVal = isQty
-      ? `<td class="tr" style="font-weight:500">${r.qty.toLocaleString()}</td><td class="tr">${fK(r.rev)}</td>`
-      : `<td class="tr" style="font-weight:500">${fK(r.rev)}</td><td class="tr">${r.qty.toLocaleString()}</td>`;
-    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${r.s}</strong></td><td style="color:#616161">—</td><td><span class="tag tb">—</span></td>${primaryVal}</tr>`;
+    const catTag = r.c ? '<span class="tag '+(CAT_TAG[r.c]||'tb')+'">'+r.c+'</span>' : '—';
+    const revCol = isQty
+      ? '<td class="tr">'+fK(r.rev)+'</td>'
+      : '<td class="tr" style="font-weight:500">'+fK(r.rev)+'</td>';
+    const qtyCol = isQty
+      ? '<td class="tr" style="font-weight:500">'+r.qty.toLocaleString()+'</td>'
+      : '<td class="tr">'+r.qty.toLocaleString()+'</td>';
+    tbody.innerHTML+=
+      '<tr>'+
+      '<td style="color:#9E9E9E">'+(i+1)+'</td>'+
+      '<td><strong>'+r.s+'</strong></td>'+
+      '<td>'+catTag+'</td>'+
+      revCol+
+      qtyCol+
+      '<td class="tr" style="color:#1565C0">'+(r.orders||0).toLocaleString()+'</td>'+
+      '<td class="tr" style="color:#1565C0">'+(r.custs||0).toLocaleString()+'</td>'+
+      '<td class="tr" style="color:#616161">'+(r.aov?fK(r.aov):'—')+'</td>'+
+      '</tr>';
   });
 }
 function renderWorst(){
@@ -1372,7 +1387,7 @@ function renderWorst(){
   const wT=document.getElementById('tb-worst');
   if(!wT) return;
   wT.innerHTML='';
-  data.forEach(r=>{wT.innerHTML+=`<tr><td><strong>${r.s}</strong></td><td style="color:#616161">—</td><td class="tr" style="color:#E53935">$${r.rev}</td><td class="tr">${r.qty}</td></tr>`;});
+  data.forEach(r=>{wT.innerHTML+=`<tr><td><strong>${r.s}</strong></td><td style="color:#616161;font-size:11px">${r.d||'—'}</td><td style="color:#9E9E9E;font-size:11px">${r.last||'—'}</td><td class="tr" style="color:#E53935">$${r.rev}</td><td class="tr">${r.qty}</td></tr>`;});
   const hd=document.getElementById('worst-hd');
   if(hd) hd.textContent=`Worst Sellers — Bottom 13 · ${pdLabel}`;
 }
@@ -1498,13 +1513,8 @@ const PERIOD_DATA={
 };
 
 // Period-filtered data for Best/Worst/Channel/Customer reports
-const PD_BEST={'30d':{rev:[{s:'BP600J',rev:714,qty:17},{s:'JT001',rev:576,qty:24},{s:'BP470N',rev:378,qty:9},{s:'DP833',rev:360,qty:12},{s:'DP440-T',rev:288,qty:9},{s:'DP790',rev:240,qty:8},{s:'DH816',rev:176,qty:8},{s:'DA467N',rev:120,qty:12}],qty:[{s:'JT001',qty:24,rev:576},{s:'BP600J',qty:17,rev:714},{s:'DP833',qty:12,rev:360},{s:'DA467N',qty:12,rev:120},{s:'BP470N',qty:9,rev:378},{s:'DP440-T',qty:9,rev:288},{s:'DP790',qty:8,rev:240},{s:'DH816',qty:8,rev:176}]},'90d':{rev:[{s:'BP600J',rev:714,qty:17},{s:'JT001',rev:576,qty:24},{s:'BP470N',rev:378,qty:9},{s:'DP833',rev:360,qty:12},{s:'DP440-T',rev:288,qty:9},{s:'DP790',rev:240,qty:8},{s:'DH816',rev:176,qty:8},{s:'DA467N',rev:120,qty:12}],qty:[{s:'JT001',qty:24,rev:576},{s:'BP600J',qty:17,rev:714},{s:'DP833',qty:12,rev:360},{s:'DA467N',qty:12,rev:120},{s:'BP470N',qty:9,rev:378},{s:'DP440-T',qty:9,rev:288},{s:'DP790',qty:8,rev:240},{s:'DH816',qty:8,rev:176}]},'ytd':{rev:[{s:'BP600J',rev:714,qty:17},{s:'JT001',rev:576,qty:24},{s:'BP470N',rev:378,qty:9},{s:'DP833',rev:360,qty:12},{s:'DP440-T',rev:288,qty:9},{s:'DP790',rev:240,qty:8},{s:'DH816',rev:176,qty:8},{s:'DA467N',rev:120,qty:12}],qty:[{s:'JT001',qty:24,rev:576},{s:'BP600J',qty:17,rev:714},{s:'DP833',qty:12,rev:360},{s:'DA467N',qty:12,rev:120},{s:'BP470N',qty:9,rev:378},{s:'DP440-T',qty:9,rev:288},{s:'DP790',qty:8,rev:240},{s:'DH816',qty:8,rev:176}]},'all':{rev:[{s:'JT001',rev:422053,qty:19788},{s:'BP433J',rev:283842,qty:7669},{s:'AS001T',rev:241697,qty:15227},{s:'BP473J',rev:241616,qty:6127},{s:'DP790-26',rev:215453,qty:11225},{s:'BP460J',rev:180980,qty:4679},{s:'DP433-26',rev:172178,qty:9062},{s:'DP783',rev:168697,qty:6159},{s:'MS006',rev:164200,qty:9800},{s:'MP005',rev:150000,qty:7000},{s:'MS007',rev:135150,qty:8350},{s:'BP471N',rev:130962,qty:3409},{s:'AB231H',rev:125800,qty:7400},{s:'AB404H',rev:124100,qty:7300},{s:'JA800',rev:122151,qty:4854},{s:'DP786',rev:121205,qty:4505},{s:'BP468J',rev:120073,qty:3211},{s:'BP370J-A',rev:117465,qty:3239},{s:'BP239J',rev:113062,qty:3298},{s:'MP006',rev:110000,qty:5000}],qty:[{s:'JT001',qty:19788,rev:422053},{s:'AS001T',qty:15227,rev:241697},{s:'DP790-26',qty:11225,rev:215453},{s:'MS006',qty:9800,rev:164200},{s:'DP433-26',qty:9062,rev:172178},{s:'MS007',qty:8350,rev:135150},{s:'BP433J',qty:7669,rev:283842},{s:'AB231H',qty:7400,rev:125800},{s:'AB404H',qty:7300,rev:124100},{s:'MP005',qty:7000,rev:150000},{s:'IP240P',qty:6900,rev:109857},{s:'MS008',qty:6200,rev:105400},{s:'DP783',qty:6159,rev:168697},{s:'BP473J',qty:6127,rev:241616},{s:'MS010',qty:5500,rev:88000},{s:'MS009',qty:5000,rev:85000},{s:'MP006',qty:5000,rev:110000},{s:'DP601-26',qty:4878,rev:93901},{s:'JA800',qty:4854,rev:122151},{s:'BP460J',qty:4679,rev:180980}]}};
-const PD_WORST={
-  '30d':[{s:'JP197',rev:10,qty:1},{s:'JH312',rev:12,qty:1},{s:'JP138',rev:15,qty:1},{s:'JP159',rev:15,qty:1},{s:'DP555N',rev:20,qty:1},{s:'DP526',rev:25,qty:1},{s:'DP787',rev:26,qty:1},{s:'BP21J',rev:29,qty:1},{s:'JP158',rev:30,qty:2},{s:'BP385J-A',rev:32,qty:1},{s:'JP125',rev:34,qty:2},{s:'BP519J',rev:36,qty:1},{s:'JP381',rev:38,qty:2}],
-  '90d':[{s:'JH316N',rev:18,qty:1},{s:'DP677',rev:19,qty:1},{s:'DP501J-C',rev:20,qty:1},{s:'DP662N',rev:25,qty:1},{s:'BK445J',rev:27,qty:1},{s:'JP197',rev:30,qty:3},{s:'JP159',rev:30,qty:2},{s:'BP334J',rev:34,qty:1},{s:'BP449J',rev:35,qty:1},{s:'JH312',rev:36,qty:3},{s:'DP555N',rev:40,qty:2},{s:'BP393J-C',rev:40,qty:1},{s:'JH354',rev:48,qty:4}],
-  'ytd':[{s:'JH316N',rev:18,qty:1},{s:'DP677',rev:19,qty:1},{s:'DP501J-C',rev:20,qty:1},{s:'DP662N',rev:25,qty:1},{s:'BK445J',rev:27,qty:1},{s:'JP197',rev:30,qty:3},{s:'JP159',rev:30,qty:2},{s:'BP334J',rev:34,qty:1},{s:'BP449J',rev:35,qty:1},{s:'JH312',rev:36,qty:3},{s:'DP555N',rev:40,qty:2},{s:'BP393J-C',rev:40,qty:1},{s:'JH354',rev:48,qty:4}],
-  'all':[{s:'DP430',rev:18,qty:1},{s:'AB826',rev:18,qty:1},{s:'BP241J',rev:19,qty:1},{s:'JP235',rev:19,qty:1},{s:'DP651N',rev:25,qty:1},{s:'BP205J',rev:25,qty:1},{s:'BP237J',rev:25,qty:1},{s:'BP351J-A',rev:25,qty:1},{s:'BP227J',rev:25,qty:1},{s:'DA527N',rev:28,qty:1},{s:'BP97J',rev:31,qty:1},{s:'BP96J',rev:34,qty:2},{s:'BP271J',rev:34,qty:1}],
-};
+const PD_BEST={'30d':{rev:[{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120}],qty:[{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225}]},'90d':{rev:[{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120}],qty:[{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225}]},'ytd':{rev:[{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120}],qty:[{s:'JT001',rev:576,qty:24,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP600J',rev:714,qty:17,d:'SCISSOR CUT CUFFED SLIM WIDE',c:'PANTS',orders:97,custs:81,aov:690},{s:'DP833',rev:360,qty:12,d:'',c:'',orders:31,custs:29,aov:529},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',orders:1,custs:1,aov:120},{s:'BP470N',rev:378,qty:9,d:'RELAXED STRAIGHT',c:'PANTS',orders:52,custs:48,aov:730},{s:'DP440-T',rev:288,qty:9,d:'STRETCH TWILL TROUSER',c:'PANTS',orders:49,custs:46,aov:467},{s:'DP790',rev:240,qty:8,d:'MINI PATCH POCKET WIDE',c:'PANTS',orders:167,custs:156,aov:624},{s:'DH816',rev:176,qty:8,d:'90S CUT OFF SHORT',c:'SHORT PANTS',orders:71,custs:65,aov:225}]},'all':{rev:[{s:'JT001',rev:422053,qty:19788,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'BP433J',rev:283842,qty:7669,d:'PATCH POCKET WIDE LEG',c:'PANTS',orders:393,custs:331,aov:722},{s:'AS001T',rev:241697,qty:15227,d:'',c:'',orders:7,custs:1,aov:34528},{s:'BP473J',rev:241616,qty:6127,d:'BARREL JEAN WITH SEAMS',c:'PANTS',orders:280,custs:234,aov:863},{s:'DP790-26',rev:215453,qty:11225,d:'',c:'',orders:6,custs:1,aov:35909},{s:'BP460J',rev:180980,qty:4679,d:'SCISSOR CUT WIDE LEG',c:'PANTS',orders:212,custs:171,aov:854},{s:'DP433-26',rev:172178,qty:9062,d:'',c:'',orders:4,custs:1,aov:43044},{s:'DP783',rev:168697,qty:6159,d:'HR VINTAGE STRAIGHT',c:'PANTS',orders:283,custs:249,aov:596},{s:'MS006',rev:164200,qty:9800,d:'',c:'',orders:8,custs:1,aov:20525},{s:'MP005',rev:150000,qty:7000,d:'',c:'',orders:5,custs:1,aov:30000},{s:'MS007',rev:135150,qty:8350,d:'',c:'',orders:7,custs:1,aov:19307},{s:'BP471N',rev:130962,qty:3409,d:'BARREL JEAN TWIST',c:'PANTS',orders:176,custs:161,aov:744},{s:'AB231H',rev:125800,qty:7400,d:'LAYLAH SHORT',c:'SHORT PANTS',orders:14,custs:1,aov:8986},{s:'AB404H',rev:124100,qty:7300,d:'PATCH POCKET SHORT',c:'SHORT PANTS',orders:19,custs:1,aov:6532},{s:'JA800',rev:122151,qty:4854,d:'COLLARLESS JACKET',c:'JACKET',orders:40,custs:34,aov:3054},{s:'DP786',rev:121205,qty:4505,d:'BARREL JEAN',c:'PANTS',orders:148,custs:141,aov:819},{s:'BP468J',rev:120073,qty:3211,d:'SLIM PALAZZO WITH SCISSOR CUT',c:'PANTS',orders:137,custs:128,aov:876},{s:'BP370J-A',rev:117465,qty:3239,d:'HR TONAL CROP FLARE',c:'PANTS',orders:177,custs:167,aov:664},{s:'BP239J',rev:113062,qty:3298,d:'HR WIDE LEG',c:'PANTS',orders:81,custs:67,aov:1396},{s:'MP006',rev:110000,qty:5000,d:'',c:'',orders:2,custs:1,aov:55000}],qty:[{s:'JT001',rev:422053,qty:19788,d:'DENIM SKORT',c:'SHORT PANTS',orders:428,custs:309,aov:986},{s:'AS001T',rev:241697,qty:15227,d:'',c:'',orders:7,custs:1,aov:34528},{s:'DP790-26',rev:215453,qty:11225,d:'',c:'',orders:6,custs:1,aov:35909},{s:'MS006',rev:164200,qty:9800,d:'',c:'',orders:8,custs:1,aov:20525},{s:'DP433-26',rev:172178,qty:9062,d:'',c:'',orders:4,custs:1,aov:43044},{s:'MS007',rev:135150,qty:8350,d:'',c:'',orders:7,custs:1,aov:19307},{s:'BP433J',rev:283842,qty:7669,d:'PATCH POCKET WIDE LEG',c:'PANTS',orders:393,custs:331,aov:722},{s:'AB231H',rev:125800,qty:7400,d:'LAYLAH SHORT',c:'SHORT PANTS',orders:14,custs:1,aov:8986},{s:'AB404H',rev:124100,qty:7300,d:'PATCH POCKET SHORT',c:'SHORT PANTS',orders:19,custs:1,aov:6532},{s:'MP005',rev:150000,qty:7000,d:'',c:'',orders:5,custs:1,aov:30000},{s:'IP240P',rev:109857,qty:6900,d:'SCISSOR CUT LONGER LENGTH SLIM WIDE JEAN',c:'PANTS',orders:24,custs:1,aov:4577},{s:'MS008',rev:105400,qty:6200,d:'',c:'',orders:4,custs:1,aov:26350},{s:'DP783',rev:168697,qty:6159,d:'HR VINTAGE STRAIGHT',c:'PANTS',orders:283,custs:249,aov:596},{s:'BP473J',rev:241616,qty:6127,d:'BARREL JEAN WITH SEAMS',c:'PANTS',orders:280,custs:234,aov:863},{s:'MS010',rev:88000,qty:5500,d:'',c:'',orders:3,custs:1,aov:29333},{s:'MS009',rev:85000,qty:5000,d:'',c:'',orders:2,custs:1,aov:42500},{s:'MP006',rev:110000,qty:5000,d:'',c:'',orders:2,custs:1,aov:55000},{s:'DP601-26',rev:93901,qty:4878,d:'',c:'',orders:2,custs:1,aov:46951},{s:'JA800',rev:122151,qty:4854,d:'COLLARLESS JACKET',c:'JACKET',orders:40,custs:34,aov:3054},{s:'BP460J',rev:180980,qty:4679,d:'SCISSOR CUT WIDE LEG',c:'PANTS',orders:212,custs:171,aov:854}]}};
+const PD_WORST={'30d':[{s:'DH712N',rev:52,qty:4,d:'NON STRETCH BOYFRIEND SHORT',c:'SHORT PANTS',last:'2026-03-02'},{s:'JP244',rev:60,qty:4,d:'SOFT AND STRETCHY SKINNY',c:'PANTS',last:'2025-07-10'},{s:'JH310',rev:60,qty:6,d:'HR HEM SLIT DETAILED SHORT',c:'SHORT PANTS',last:'2026-01-08'},{s:'JH314N',rev:60,qty:6,d:'HR DESTROYED SHORT W/ FRAY HEM',c:'SHORT PANTS',last:'2026-01-08'},{s:'DH808',rev:78,qty:6,d:'BUTTON DOWN CLEAN HEM SHORT',c:'SHORT PANTS',last:'2026-01-27'},{s:'JP242',rev:88,qty:4,d:'RELAXED WIDE LEG',c:'PANTS',last:'2026-03-09'},{s:'JP222',rev:100,qty:10,d:'MID RISE SCISSOR CUT SKINNY',c:'PANTS',last:'2025-11-10'},{s:'JA198N',rev:100,qty:10,d:'VINTAGE DISTRESSED JACKET',c:'JACKET',last:'2025-09-16'},{s:'JH316N',rev:108,qty:9,d:'DISTRESSED RIGID WALKING SHORT',c:'SHORT PANTS',last:'2026-03-31'},{s:'JK431',rev:114,qty:6,d:'',c:'',last:'2026-02-25'},{s:'JP216',rev:119,qty:7,d:'SUPER STRETCH FLARE',c:'PANTS',last:'2025-08-13'},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',last:'2026-03-13'},{s:'DA367N',rev:120,qty:12,d:'BOYFRIEND JACKET',c:'OUTERWEAR',last:'2026-01-22'}],'90d':[{s:'DH712N',rev:52,qty:4,d:'NON STRETCH BOYFRIEND SHORT',c:'SHORT PANTS',last:'2026-03-02'},{s:'JP244',rev:60,qty:4,d:'SOFT AND STRETCHY SKINNY',c:'PANTS',last:'2025-07-10'},{s:'JH310',rev:60,qty:6,d:'HR HEM SLIT DETAILED SHORT',c:'SHORT PANTS',last:'2026-01-08'},{s:'JH314N',rev:60,qty:6,d:'HR DESTROYED SHORT W/ FRAY HEM',c:'SHORT PANTS',last:'2026-01-08'},{s:'DH808',rev:78,qty:6,d:'BUTTON DOWN CLEAN HEM SHORT',c:'SHORT PANTS',last:'2026-01-27'},{s:'JP242',rev:88,qty:4,d:'RELAXED WIDE LEG',c:'PANTS',last:'2026-03-09'},{s:'JP222',rev:100,qty:10,d:'MID RISE SCISSOR CUT SKINNY',c:'PANTS',last:'2025-11-10'},{s:'JA198N',rev:100,qty:10,d:'VINTAGE DISTRESSED JACKET',c:'JACKET',last:'2025-09-16'},{s:'JH316N',rev:108,qty:9,d:'DISTRESSED RIGID WALKING SHORT',c:'SHORT PANTS',last:'2026-03-31'},{s:'JK431',rev:114,qty:6,d:'',c:'',last:'2026-02-25'},{s:'JP216',rev:119,qty:7,d:'SUPER STRETCH FLARE',c:'PANTS',last:'2025-08-13'},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',last:'2026-03-13'},{s:'DA367N',rev:120,qty:12,d:'BOYFRIEND JACKET',c:'OUTERWEAR',last:'2026-01-22'}],'ytd':[{s:'DH712N',rev:52,qty:4,d:'NON STRETCH BOYFRIEND SHORT',c:'SHORT PANTS',last:'2026-03-02'},{s:'JP244',rev:60,qty:4,d:'SOFT AND STRETCHY SKINNY',c:'PANTS',last:'2025-07-10'},{s:'JH310',rev:60,qty:6,d:'HR HEM SLIT DETAILED SHORT',c:'SHORT PANTS',last:'2026-01-08'},{s:'JH314N',rev:60,qty:6,d:'HR DESTROYED SHORT W/ FRAY HEM',c:'SHORT PANTS',last:'2026-01-08'},{s:'DH808',rev:78,qty:6,d:'BUTTON DOWN CLEAN HEM SHORT',c:'SHORT PANTS',last:'2026-01-27'},{s:'JP242',rev:88,qty:4,d:'RELAXED WIDE LEG',c:'PANTS',last:'2026-03-09'},{s:'JP222',rev:100,qty:10,d:'MID RISE SCISSOR CUT SKINNY',c:'PANTS',last:'2025-11-10'},{s:'JA198N',rev:100,qty:10,d:'VINTAGE DISTRESSED JACKET',c:'JACKET',last:'2025-09-16'},{s:'JH316N',rev:108,qty:9,d:'DISTRESSED RIGID WALKING SHORT',c:'SHORT PANTS',last:'2026-03-31'},{s:'JK431',rev:114,qty:6,d:'',c:'',last:'2026-02-25'},{s:'JP216',rev:119,qty:7,d:'SUPER STRETCH FLARE',c:'PANTS',last:'2025-08-13'},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',last:'2026-03-13'},{s:'DA367N',rev:120,qty:12,d:'BOYFRIEND JACKET',c:'OUTERWEAR',last:'2026-01-22'}],'all':[{s:'DH712N',rev:52,qty:4,d:'NON STRETCH BOYFRIEND SHORT',c:'SHORT PANTS',last:'2026-03-02'},{s:'JP244',rev:60,qty:4,d:'SOFT AND STRETCHY SKINNY',c:'PANTS',last:'2025-07-10'},{s:'JH310',rev:60,qty:6,d:'HR HEM SLIT DETAILED SHORT',c:'SHORT PANTS',last:'2026-01-08'},{s:'JH314N',rev:60,qty:6,d:'HR DESTROYED SHORT W/ FRAY HEM',c:'SHORT PANTS',last:'2026-01-08'},{s:'DH808',rev:78,qty:6,d:'BUTTON DOWN CLEAN HEM SHORT',c:'SHORT PANTS',last:'2026-01-27'},{s:'JP242',rev:88,qty:4,d:'RELAXED WIDE LEG',c:'PANTS',last:'2026-03-09'},{s:'JP222',rev:100,qty:10,d:'MID RISE SCISSOR CUT SKINNY',c:'PANTS',last:'2025-11-10'},{s:'JA198N',rev:100,qty:10,d:'VINTAGE DISTRESSED JACKET',c:'JACKET',last:'2025-09-16'},{s:'JH316N',rev:108,qty:9,d:'DISTRESSED RIGID WALKING SHORT',c:'SHORT PANTS',last:'2026-03-31'},{s:'JK431',rev:114,qty:6,d:'',c:'',last:'2026-02-25'},{s:'JP216',rev:119,qty:7,d:'SUPER STRETCH FLARE',c:'PANTS',last:'2025-08-13'},{s:'DA467N',rev:120,qty:12,d:'SUPER DESTROYED CROPPED JACKET',c:'OUTERWEAR',last:'2026-03-13'},{s:'DA367N',rev:120,qty:12,d:'BOYFRIEND JACKET',c:'OUTERWEAR',last:'2026-01-22'}]};
 const PD_CH={
   '30d':{
     SHOWROOM:[{s:'BP433J',rev:48920,qty:1262},{s:'BP353J',rev:41380,qty:1123},{s:'BP460J',rev:32140,qty:860},{s:'BP473J',rev:28640,qty:732},{s:'BP370J-A',rev:24180,qty:654},{s:'BP468J',rev:21840,qty:564},{s:'BP339J',rev:18920,qty:506},{s:'BP333J',rev:16480,qty:432},{s:'JT001',rev:14280,qty:687},{s:'BP471N',rev:12140,qty:309}],
@@ -1577,11 +1587,28 @@ function setPd(v){
   const d=PERIOD_DATA[v];
   if(!d) return;
   // Update KPIs
+  const rlbl=document.getElementById('ov-rev-lbl'); if(rlbl) rlbl.textContent='Revenue ('+d.label+')';
   const el=document.getElementById('ov-rev'); if(el) el.textContent=fK(d.rev);
   const el2=document.getElementById('ov-inv'); if(el2) el2.textContent=d.invoices.toLocaleString();
   const el3=document.getElementById('ov-inv-sub'); if(el3) el3.textContent=d.customers.toLocaleString()+' customers';
   const el4=document.getElementById('ov-inv-lbl'); if(el4) el4.textContent='Invoices ('+d.label+')';
-  const el5=document.getElementById('ov-rev-sub'); if(el5) el5.textContent=d.label;
+  // MoM: compare current period rev vs previous same-length period
+  const el5=document.getElementById('ov-rev-sub');
+  if(el5){
+    const MOM={'30d':{prev:3014749,label:'Feb'},
+               '90d':{prev:8584765,label:'prev 90d'},
+               'ytd':{prev:0,label:''},
+               'all':{prev:0,label:''}};
+    const mm=MOM[v];
+    if(mm&&mm.prev>0){
+      const chg=((d.rev-mm.prev)/mm.prev*100).toFixed(1);
+      el5.textContent=(chg>=0?'↑ +':('↓ '))+Math.abs(chg)+'% vs '+mm.label;
+      el5.className='ksub '+(chg>=0?'up':'dn');
+    } else {
+      el5.textContent=d.label;
+      el5.className='ksub';
+    }
+  }
   document.getElementById('pg-sub').textContent=d.label+' · Invoice basis';
   // Redraw monthly revenue chart
   if(revChart) revChart.destroy();
@@ -1676,8 +1703,10 @@ function updateCustStyle(){
   const pd=PD_CUST[curPeriod]||PD_CUST['all'];
   const c=pd[idx]||pd[0];
   const pdLabel=(PERIOD_DATA[curPeriod]||{}).label||'All Time';
-  document.getElementById('cs-chart-hd').textContent=`Top Styles — ${c.c} · ${pdLabel}`;
-  document.getElementById('cs-tbl-hd').textContent=`Style Detail · Total Invoice: ${fK(c.rev)}`;
+  document.getElementById('cs-chart-hd').textContent='Top Styles — '+c.c+' · '+pdLabel;
+  // Use c.inv (invoice total) for header, c.rev is SO-based
+  const invTotal=c.inv||c.rev;
+  document.getElementById('cs-tbl-hd').textContent='Style Detail · Total Invoice: '+fK(invTotal)+(c.last?' · Last order: '+c.last:'');
   const totalRev=c.styles.reduce((a,s)=>a+s.rev,0);
   if(csChart) csChart.destroy();
   csChart=new Chart(document.getElementById('c-cust-style'),{
@@ -1687,9 +1716,10 @@ function updateCustStyle(){
   });
   const tbody=document.getElementById('tb-cust-style');
   tbody.innerHTML='';
+  if(!c.styles||!c.styles.length){tbody.innerHTML='<tr><td colspan="4" style="color:#9E9E9E;text-align:center;padding:20px">No data</td></tr>';return;}
   c.styles.forEach((s,i)=>{
-    const share=(s.rev/totalRev*100).toFixed(1);
-    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${s.s}</strong></td><td class="tr" style="font-weight:500">${fK(s.rev)}</td><td class="tr">${s.qty.toLocaleString()}</td><td class="tr">${share}%</td></tr>`;
+    const share=totalRev>0?(s.rev/totalRev*100).toFixed(1):'0.0';
+    tbody.innerHTML+=`<tr><td style="color:#9E9E9E">${i+1}</td><td><strong>${s.s}</strong></td><td class="tr" style="font-weight:500">${fK(s.rev)}</td><td class="tr">${share}%</td></tr>`;
   });
 }
 
@@ -1930,37 +1960,18 @@ function drawTsCompare(){
 
 // ── CHARTS ───────────────────────────────────────────────
 function drawCharts(pg){
-  if(ci[pg])return;ci[pg]=true;
+  if(ci[pg]&&pg!=='overview'){return;} ci[pg]=true;
   if(pg==='overview'){
-    const pd=PERIOD_DATA[curPeriod]||PERIOD_DATA['all'];
-    const mos=Object.keys(pd.monthly), vals=Object.values(pd.monthly);
-    revChart=new Chart(document.getElementById('c-rev'),{type:'bar',data:{labels:mos,datasets:[{data:vals,backgroundColor:vals.map((_,i)=>i===vals.length-1?P.green:P.blue),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{bottom:2}},plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45,autoSkip:false}}}}});
-    // Top 5 Styles this month — horizontal bar
-    const top5 = (PD_BEST['30d']||{}).rev||[];
-    const top5data = top5.slice(0,5);
-    top5Chart=new Chart(document.getElementById('c-top5'),{
-      type:'bar',
-      data:{
-        labels: top5data.map(d=>d.s),
-        datasets:[{
-          data: top5data.map(d=>d.rev),
-          backgroundColor:[P.blue,P.indigo,P.teal,P.green,P.sky],
-          borderRadius:4
-        }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        indexAxis:'y',
-        plugins:{legend:{display:false},
-          tooltip:{callbacks:{label:ctx=>' '+fK(ctx.raw)}}
-        },
-        scales:{
-          x:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},
-          y:{grid:{display:false},ticks:{font:{size:10},color:'#212121'}}
-        }
-      }
-    });
-    new Chart(document.getElementById('c-chan'),{type:'bar',data:{labels:['In-House','Web','Trade Shows','Fashion Go','Other'],datasets:[{data:[47584958.63,11954544.67,8075777.45,3031400.44,696229.59],backgroundColor:[P.indigo,P.green,P.purple,P.orange,P.teal],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:9}}}}}});
+
+    if(window.chanChart) window.chanChart.destroy();
+    window.chanChart=new Chart(document.getElementById('c-chan'),{type:'bar',
+    data:{labels:['In-House','Web','Trade Shows','Fashion Go','Other'],
+    datasets:[{data:[47584958,11954544,8075777,3031400,696229],
+    backgroundColor:[P.indigo,P.green,P.purple,P.orange,P.teal],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{display:false}},
+    scales:{x:{ticks:{callback:v=>fK(v),font:{size:8}},grid:{color:gc}},
+    y:{grid:{display:false},ticks:{font:{size:9}}}}}});
   }
   if(pg==='best'){
     updateBestSellers();
@@ -1968,8 +1979,8 @@ function drawCharts(pg){
   }
   if(pg==='customers'){
     // c-cust and c-custd drawn here, c-new-cust and c-funnel by initCustOverview
-    new Chart(document.getElementById('c-cust'),{type:'bar',data:{labels:CUST_MO.map(d=>d.m),datasets:[{label:'Repeat',data:CUST_MO.map(d=>d.r),backgroundColor:P.blue,borderRadius:2,stack:'s'},{label:'New',data:CUST_MO.map(d=>d.n),backgroundColor:P.green,borderRadius:2,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{bottom:2}},plugins:{legend:{labels:{font:{size:9},boxWidth:9}}},scales:{y:{stacked:true,grid:{color:gc},ticks:{font:{size:8}}},x:{stacked:true,grid:{display:false},ticks:{font:{size:8},maxRotation:0,autoSkip:false}}}}});
-    new Chart(document.getElementById('c-custd'),{type:'doughnut',data:{labels:['Repeat 66.3%','New 33.7%'],datasets:[{data:[4081,2078],backgroundColor:[P.blue,P.green],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9}}}}});
+    new Chart(document.getElementById('c-cust'),{type:'bar',data:{labels:CUST_MO.slice(-13).map(d=>d.m.slice(5)),datasets:[{label:'Repeat',data:CUST_MO.slice(-13).map(d=>d.r),backgroundColor:P.blue,borderRadius:2,stack:'s'},{label:'New',data:CUST_MO.slice(-13).map(d=>d.n),backgroundColor:P.green,borderRadius:2,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{bottom:2}},plugins:{legend:{labels:{font:{size:9},boxWidth:9}}},scales:{y:{stacked:true,grid:{color:gc},ticks:{font:{size:8}}},x:{stacked:true,grid:{display:false},ticks:{font:{size:8},maxRotation:0,autoSkip:false}}}}});
+    new Chart(document.getElementById('c-custd'),{type:'doughnut',data:{labels:['Repeat 66.0%','New 34.0%'],datasets:[{data:[4721,2437],backgroundColor:[P.blue,P.green],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:9}}}}});
   }
   if(pg==='str'){
     new Chart(document.getElementById('c-str'),{type:'bar',data:{labels:STR.map(d=>d.s),datasets:[{data:STR.map(d=>d.v),backgroundColor:STR.map(d=>d.v>20?P.green:d.v>10?P.yellow:P.red),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{max:35,ticks:{callback:v=>v+'%',font:{size:8}},grid:{color:gc}},x:{grid:{display:false},ticks:{font:{size:9}}}}}});
@@ -1991,7 +2002,7 @@ function drawCharts(pg){
     new Chart(document.getElementById('c-oversold'),{type:'bar',data:{labels:top8.map(r=>r.s),datasets:[{label:'OTS',data:top8.map(r=>r.ots),backgroundColor:P.red,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:8}},grid:{color:gc}},y:{grid:{display:false},ticks:{font:{size:9}}}}}});
   }
 }
-setTimeout(()=>drawCharts('overview'),80);
+setPd('all');setTimeout(()=>drawCharts('overview'),80);
 setTimeout(()=>renderInsight('overview'),120);
 
 // ── INSIGHT BAR ──────────────────────────────────────────
