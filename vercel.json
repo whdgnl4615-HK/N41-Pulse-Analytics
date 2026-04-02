@@ -2,7 +2,7 @@
   "outputDirectory": ".",
   "functions": {
     "api/ai.py": {
-      "runtime": "python3.9"
+      "runtime": "vercel-python@4.1.1"
     }
   }
 }
