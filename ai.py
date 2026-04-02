@@ -9,7 +9,6 @@ class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get('Content-Length', 0))
         body = json.loads(self.rfile.read(length))
-
         try:
             msg = client.messages.create(
                 model=body.get('model', 'claude-sonnet-4-20250514'),
@@ -22,7 +21,6 @@ class handler(BaseHTTPRequestHandler):
         except Exception as e:
             result = {'error': str(e)}
             self.send_response(500)
-
         self.send_header('Content-Type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
