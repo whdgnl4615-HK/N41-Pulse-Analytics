@@ -1,11 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/ai.py", "use": "@vercel/python" }
-  ],
-  "routes": [
-    { "src": "/api/ai", "dest": "/api/ai.py" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "outputDirectory": ".",
+  "functions": {
+    "api/ai.py": {
+      "runtime": "python3.9"
+    }
+  }
 }
